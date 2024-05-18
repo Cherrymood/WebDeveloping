@@ -1,0 +1,39 @@
+body{
+    background-color: #B3C2D5;
+    color: #545454;
+    font-family: Arvo, sans-serif;
+}
+
+h1{
+    color: #545454;
+    font-family: Arvo, sans-serif;
+}
+
+.background{
+    background-image: url("./img/background.jpg");
+    background-size: 100vw;
+    background-repeat: no-repeat;
+}
+
+.profile-img {
+    height: 250px;
+    border-radius: 50%;
+  }
+
+.pro{
+    font-weight: bolder;
+    color: #A0DEFF;
+    font-size: 4.5rem;
+}
+
+.project-img{
+
+    height: 140px;
+    border-radius: 50%;
+
+}
+
+.custom-margin {
+    margin-top: 0px;
+    margin-bottom: 20px;
+}
