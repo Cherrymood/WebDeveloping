@@ -10,28 +10,26 @@ var l = new Audio('./sounds/tom-4.mp3');
 
 var arr = [w, a, s, d, j, k, l];
 
-var drumButtons = document.querySelectorAll(".drum");
 
 for( let i = 0; i < numberDrums; i++)
 {
     document.querySelectorAll(".drum")[i].addEventListener("click", function() {
        
         var key = this.innerHTML.toLowerCase();
-
         makeSound(key);
     });
 }
+var drumButtons = document.querySelectorAll(".drum");
 
 document.addEventListener("keypress", function(event) {
        
     var btn = event.key.toLowerCase();
-
+    
     makeSound(btn);
 });
 
 function makeSound(key)
 {
-    var index;
     switch(key){
         case 'w': index = 0; break;
         case 'a': index = 1; break;
