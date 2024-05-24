@@ -100,6 +100,13 @@ function startOver(){
         level = 0;
         gamePattern = [];
         start = false;
+
+
+        setTimeout(function()
+        {
+            $("#level-title").text("Press A Key to Start");
+
+        }, 800);  
     }
 }
 
