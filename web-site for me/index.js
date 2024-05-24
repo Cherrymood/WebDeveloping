@@ -17,6 +17,7 @@ for( let i = 0; i < numberDrums; i++)
        
         var key = this.innerHTML.toLowerCase();
         makeSound(key);
+        buttonAnimation(key);
     });
 }
 var drumButtons = document.querySelectorAll(".drum");
@@ -26,6 +27,7 @@ document.addEventListener("keypress", function(event) {
     var btn = event.key.toLowerCase();
     
     makeSound(btn);
+    buttonAnimation(btn);
 });
 
 function makeSound(key)
@@ -43,4 +45,15 @@ function makeSound(key)
     
     drumButtons[index].style.color = "white";
     arr[index].play();
+}
+
+function buttonAnimation(key)
+{
+    var activeB = document.querySelector("." + key);
+    activeB.classList.add("pressed");
+
+    setTimeout( function() {
+        activeB.classList.remove("pressed");
+        activeB.style.color = "#B3C2D5";ww
+    }, 100);
 }
