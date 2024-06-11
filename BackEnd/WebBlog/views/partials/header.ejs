@@ -4,6 +4,12 @@
             <li><a href="/">Home</a></li>
             <li><a href="#">About Me</a></li>
             <li><a href="#">Contact Me</a></li>
+
+            <% if(isAuthenticated) { %>
+                <a href="/">Logout</a>
+            <% } else { %>
+                <a href="/login">Login</a>
+            <% } %>
         </ul>
     </nav>
 </header>
