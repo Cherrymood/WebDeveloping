@@ -1,7 +1,7 @@
 import express from "express";
 
 const app = express();
-const post = 3000;
+const port = 3000;
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -13,7 +13,7 @@ const blogPosts = [
 
 app.get('/', (req, res) => 
 {
-    res.render('/pages/home', { blogPosts });
+    res.render('../views/pages/home', { blogPosts });
 });
 
 app.get('/pages/:id', (req, res) =>

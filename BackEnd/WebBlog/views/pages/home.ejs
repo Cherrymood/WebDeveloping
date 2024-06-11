@@ -10,7 +10,9 @@
 
         <h1>Welcome to my Blog</h1>
         <ul>
-            
+            <% blogPosts.forEach((post) => { %>
+                <li><a href="/pages/<%=post.id %>"><%=post.title %></a></li>
+                <% }); %>
         </ul>
 
         <%- include('../partials/footer')%>
