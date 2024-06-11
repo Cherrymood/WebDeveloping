@@ -1,0 +1,18 @@
+<%- include("partials/header.ejs") %>
+
+<h1>Make Your Post</h1>
+
+<div class="mb-3 mt-lg-5">
+    <input type="email" name="eMail" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+  </div>
+  <div class="mb-3">
+    <input type="nickname" name="nickName" class="form-control" id="exampleFormControlInput1" placeholder="nickname">
+  </div>
+  <div class="mb-3">
+    <textarea class="form-control" name="yPost" id="exampleFormControlTextarea1" placeholder="Your Post" rows="3"></textarea>
+</div>
+<div class="col align-self-center">
+  <a href="/submitPost" class="text-body-emphasis fw-bold"><button type="button" class="btn btn-outline-success btn-lg">Post</button></a>
+</div>
+
+<%- include("partials/footer.ejs") %>v
