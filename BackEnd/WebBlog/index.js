@@ -6,10 +6,14 @@ const port = 3000;
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({extended: true}));
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = isAuthenticated;
+    next();
+});
 
 const blogPosts = [
-    { id: 1, title: 'Learning JavaScript'},
-    { id: 2, title: 'Using MERN Stack'}
+    { id: 1, title: 'Learning JavaScript', comments: []},
+    { id: 2, title: 'Using MERN Stack', comments: []}
 ];
 
 let isAuthenticated = false;
@@ -34,7 +38,31 @@ app.get('/pages/:id', (req, res) =>
     }
 });
 
-app.get('/login', (req, res) =>
+app.post('/comment/:id', (req, res) => {
+    const postId = req.params.id;
+    const post = blogPosts.find((post) => post.id == postId);
+
+    if(!isAuthenticated)
+    {
+        return res.redirect('/pages/404');
+    }
+
+    if(post)
+        {
+            const comment = req.body.comment;
+            if(comment)
+            {
+                post.comments.push(comment);
+            }
+            return res.redirect(`/pages/${postId}`);
+        }
+    else
+        {
+            return res.redirect('/pages/404');
+        }
+});
+
+app.get('/login', (req, res) => 
 {
     res.render('pages/login');
 });
