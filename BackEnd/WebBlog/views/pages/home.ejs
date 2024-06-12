@@ -2,6 +2,14 @@
     <%- include('../partials/header')%>
 
         <h1>Welcome to my Blog</h1>
+        <section03>
+            <div class="container-fluid">
+              <div class="row">
+                    <img src="/img/main.jpg"/>
+            </div>
+          </div>
+        </section03>
+
         <ul>
             <% blogPosts.forEach((post) => { %>
                 <li><a href="/pages/<%=post.id %>"><%=post.title %></a></li>
