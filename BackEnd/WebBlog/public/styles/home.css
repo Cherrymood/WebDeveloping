@@ -27,6 +27,7 @@ body{
     padding: 0 5vw;
     background: #fff;
     z-index: 9;
+    color:#ccc;
 }
 
 .links-container{
@@ -42,11 +43,24 @@ body{
     color: #000;
 }
 
+.link a {
+    text-decoration: none; /* Remove underline from links */
+    color: #686D76; /* Text color */
+    padding: 10px 20px; /* Padding inside each link */
+    display: block; /* Make the link block level to allow padding */
+    border-radius: 4px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.link a:hover {
+    background-color: #83B4FF; /* Darker background color on hover */
+}
+
 .header{
     margin-top: 60px;
     width: 100%;
-    height: calc(100vh - 60px);
-    background: url(../img/header.png);
+    height: calc(100vh - 80px);
+    background: url(/img/main1.jpg);
     background-size: cover;
     display: flex;
     justify-content: center;
@@ -110,3 +124,64 @@ body{
     background: #1b1b1b;
     color: #fff;
 }
+
+footer {
+    position: relative;
+    width: 100%;
+    background: #fff;
+    min-height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  footer .social_icon,
+  footer .menu {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+  }
+  
+  footer .social_icon li,
+  footer .menu li {
+    list-style: none;
+  }
+  footer .social_icon li a {
+    font-size: 2em;
+    color: #ccc;
+    margin: 0 10px;
+    display: inline-block;
+    transition: 0.5s;
+  }
+  footer .social_icon li a:hover {
+    transform: translateY(-15px);
+    color: #A7E6FF;
+  }
+  
+  footer .menu li a {
+    font-size: 1.2em;
+    color: #ccc;
+    margin: 0 10px;
+    display: inline-block;
+    transition: 0.5s;
+    text-decoration: none;
+    opacity: 0.75;
+  }
+  footer .menu li a:hover {
+    opacity: 1;
+    color: #fff;
+  }
+  p {
+    color: whtie;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+  }
+  
+  .copyright {
+    color: white;
+  }
