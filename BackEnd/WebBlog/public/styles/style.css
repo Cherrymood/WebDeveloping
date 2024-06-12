@@ -13,6 +13,10 @@ html, body {
   height: 100%;
 }
 
+.pictureFail {
+  background-image: url('https://img.freepik.com/free-vector/404-error-with-cute-animal-concept-illustration_114360-1931.jpg?w=826&t=st=1718162642~exp=1718163242~hmac=2c304078120551cafcbcd6acae55a8aaa0cd0240cbb209d5cc89f54dfcb95707');
+}
+
 body {
   display: flex;
   flex-direction: column;

@@ -34,7 +34,7 @@ app.get('/pages/:id', (req, res) =>
     }
     else
     {
-        res.render(404).render('pages/404');
+        res.render(404).render('pages/error');
     }
 });
 
@@ -44,7 +44,7 @@ app.post('/comment/:id', (req, res) => {
 
     if(!isAuthenticated)
     {
-        return res.redirect('/pages/404');
+        return res.redirect('/pages/error');
     }
 
     if(post)
@@ -58,7 +58,7 @@ app.post('/comment/:id', (req, res) => {
         }
     else
         {
-            return res.redirect('/pages/404');
+            return res.redirect('/pages/error');
         }
 });
 
@@ -77,7 +77,7 @@ app.post('/login', (req, res) => {
     }
     else
     {
-        res.redirect('/pagest/fail');
+        res.redirect('/pages/error');
     }
 });
 
