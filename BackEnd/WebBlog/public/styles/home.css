@@ -53,7 +53,8 @@ body{
 }
 
 .link a:hover {
-    background-color: #83B4FF; /* Darker background color on hover */
+    background-color: #686D76; /* Darker background color on hover */
+    color: white;
 }
 
 .header{
@@ -95,6 +96,16 @@ body{
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.7);
     color: #000;
+    text-decoration: none;
+    text-transform: capitalize;
+}
+
+.btn:hover
+{
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.299);
+    color: #fff;
     text-decoration: none;
     text-transform: capitalize;
 }
