@@ -21,6 +21,12 @@ const blogPosts = [
 
 let isAuthenticated = false;
 
+const users = [
+    { email: 'user1@gmail.com', username: 'John', password: '123456'},
+    { email: 'user2@gmail.com', username: 'Andy', password: '123456'},
+    { email: 'user3@gmail.com', username: 'Mike', password: '123456'}
+];
+
 app.get('/', (req, res) => 
 {
     res.render('../views/pages/home', { blogPosts, isAuthenticated});
@@ -75,15 +81,16 @@ app.get('/login', (req, res) =>
 app.post('/login', (req, res) => {
 
     const {username, password} = req.body;
-    if(username === 'john' && password === '123456')
-    {
-        isAuthenticated = true;
-        res.redirect('/');
-    }
-    else
-    {
-        res.redirect('../views/pages/error');
-    }
+
+    users.forEach((user) => {
+        
+        if(user.username === username && user.password === password)
+        {
+            isAuthenticated = true;
+            res.redirect('/');
+        }
+    });
+    res.redirect('../views/pages/error');
 });
 
 //upload link 
