@@ -79,19 +79,34 @@ app.get('/login', (req, res) =>
 });
 
 app.post('/login', (req, res) => {
-
-    const {username, password} = req.body;
+    
+    isAuthenticated = false;
+    const {email, password} = req.body;
 
     users.forEach((user) => {
         
-        if(user.username === username && user.password === password)
+        if(user.email === email && user.password === password)
         {
             isAuthenticated = true;
-            res.redirect('/');
         }
     });
-    res.redirect('../views/pages/error');
+
+    if (isAuthenticated) {
+
+        res.redirect('/');
+
+    } else {
+
+        res.status(401).render('pages/error', { message: 'Invalid email or password' });
+    }
 });
+
+app.get('/logout', (req, res) => 
+{
+    isAuthenticated = false;
+    res.redirect('/'); 
+});
+
 
 //upload link 
 app.post('/upload', (req, res) => {
