@@ -28,7 +28,22 @@ function getPost(id) {
     });
 };
 
-function insertPost(newPost) {}
+function insertPost(newPost) {
+    return new Promise((resolve, reject) => {
+        
+        const id = { id: helper.getNewId(posts) };
+        const date = { 
+            createdAt: helper.newDate(),
+            updatedAt: helper.newDate()
+        };
+
+        newPost = { ...id, ...date, ...newPost };
+        posts.push(newPost);
+        helper.writeJSONFile(filename, posts);
+        resolve(newPost);
+    });
+};
+
 function updatePost(id, newPost) {}
 function deletePost(id) {}
 module.exports = {
