@@ -20,7 +20,15 @@
                 blog
                 <span class="no-fill">writing</span>
             </h1>
-            <a href="/editor" class="btn">write a blog</a>
+            <% if (locals.isAuthenticated) {%>
+                
+                <a href="/editor" class="btn">write a blog</a>
+
+            <%} else {%>
+
+                <a href="/login" class="btn">write a blog</a>
+
+            <% } %>
         </div>
     </header>
         <ul>
@@ -31,10 +39,6 @@
 
         <%- include('../partials/footer')%>
 
-<script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-firestore.js"></script>
-
-<script src="js/firebase.js"></script>
 <script src="js/home.js"></script>
 
 </body>

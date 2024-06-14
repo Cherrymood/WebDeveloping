@@ -1,5 +1,6 @@
 import express from "express";
 import fileupload from "express-fileupload";
+import fs from "fs";
 
 const app = express();
 const port = 3000;
@@ -14,12 +15,14 @@ app.use((req, res, next) => {
     next();
 });
 
-const blogPosts = [
-    { id: 1, title: 'Learning JavaScript', comments: []},
-    { id: 2, title: 'Using MERN Stack', comments: []}
-];
-
 let isAuthenticated = false;
+
+let id = 3;
+
+const blogPosts = [
+    { id: 1, banner:'1718303662703copy-space-new-year-crafting-decorations-time', title: 'Learning JavaScript', article: 'text',comments: []},
+    { id: 2, banner:'1718303668710elegant-wedding-invitation', title: 'Learning JavaScript', article: 'text',comments: []},
+];
 
 const users = [
     { email: 'user1@gmail.com', username: 'John', password: '123456'},
@@ -45,11 +48,6 @@ app.get('/pages/:id', (req, res) =>
     {
         res.redirect('../views/pages/error');
     }
-});
-
-app.get('/editor', (req, res) =>
-{
-    res.render('../views/pages/editor');
 });
 
 app.post('/comment/:id', (req, res) => {
@@ -81,6 +79,7 @@ app.get('/login', (req, res) =>
 app.post('/login', (req, res) => {
     
     isAuthenticated = false;
+
     const {email, password} = req.body;
 
     users.forEach((user) => {
@@ -107,6 +106,10 @@ app.get('/logout', (req, res) =>
     res.redirect('/'); 
 });
 
+app.get('/editor', (req, res) =>
+{
+    res.render('../views/pages/editor');
+});
 
 //upload link 
 app.post('/upload', (req, res) => {
@@ -130,6 +133,24 @@ app.post('/upload', (req, res) => {
         }
     });
 })
+
+app.post('/publish', (req, res) => {
+    
+    //Extract title and article from request body
+    let { title, article } = req.body;
+
+    
+
+});
+    
+
+// Route for serving the form page
+app.get('/editor', (req, res) => {
+    // Send the HTML file for the editor page
+    res.sendFile(path.join(__dirname, 'views/editor.html'));
+});
+
+
 
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
