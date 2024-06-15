@@ -1,34 +1,27 @@
 import express from "express";
 import fileupload from "express-fileupload";
-import fs from "fs";
+import path from 'path';
+import fs from 'fs';
+import http from "http";
 
 const app = express();
 const port = 3000;
 
-app.use(express.static("./public"));
-
-app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
+
+app.use(express.static("./public"));
+app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
     res.locals.isAuthenticated = isAuthenticated;
     next();
 });
+const blogPosts = [];
+const users = [];
+
+app.set('view engine', 'ejs');
 
 let isAuthenticated = false;
-
-let id = 3;
-
-const blogPosts = [
-    { id: 1, banner:'1718303662703copy-space-new-year-crafting-decorations-time', title: 'Learning JavaScript', article: 'text',comments: []},
-    { id: 2, banner:'1718303668710elegant-wedding-invitation', title: 'Learning JavaScript', article: 'text',comments: []},
-];
-
-const users = [
-    { email: 'user1@gmail.com', username: 'John', password: '123456'},
-    { email: 'user2@gmail.com', username: 'Andy', password: '123456'},
-    { email: 'user3@gmail.com', username: 'Mike', password: '123456'}
-];
 
 app.get('/', (req, res) => 
 {
@@ -38,7 +31,10 @@ app.get('/', (req, res) =>
 app.get('/pages/:id', (req, res) =>
 {
     const postId = req.params.id;
-    const post = blogPosts.find((post) => post.id == postId);
+
+    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
+
+    const post = data.blogs.find((post) => post[id] === postId);
 
     if(post)
     {
@@ -52,11 +48,16 @@ app.get('/pages/:id', (req, res) =>
 
 app.post('/comment/:id', (req, res) => {
     const postId = req.params.id;
-    const post = blogPosts.find((post) => post.id == postId);
+
+    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
+
+    const post = data.blogs.find((post) => post[id] === postId);
+
 
     if(post)
         {
             const comment = req.body.comment;
+
             post.comments.push(comment);
             
             if(comment)
@@ -71,24 +72,123 @@ app.post('/comment/:id', (req, res) => {
         }
 });
 
+app.post('/register', (req, res) => {
+        //read the data from json file
+        let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
+
+        if(!dataExp)
+        {
+            console.log('no data availiable');
+            let data = {};
+            data.users = [];
+    
+            let newUser = {
+                name: req.body.name,
+                email: req.body.email,
+                password: req.body.password,
+                id: 1
+              };
+    
+            data.users.push(newUser);
+    
+            let dataToFile = JSON.stringify(data);
+    
+            fs.writeFile('./modules/data.json', dataToFile, function(err) {
+            if (err) throw err;
+            console.log('Intial User created');
+            });
+    
+        } else {
+          // As we have seen we store a JSON string in the data file. So when we read the file and store the data into the variable dataExp we have JSON string data in that variable.
+          //  To process these data in our JavaScript code we must parse this JSON so that a JavaScript object is created from the JSON string.
+          //  This is what we do with the JSON.parse() function.
+          
+          let data = JSON.parse(dataExp);
+    
+          if(!data.users) {
+            console.log('no users are available')
+            data.users = []
+    
+            let newUser = {
+                name: req.body.name,
+                email: req.body.email,
+                password: req.body.password,
+                id: 1
+              };
+    
+          data.users.push(newUser);
+    
+          // With JSON.stringify() we take the JavaScript data object, create a JSON string out of it and store this string into the dataToFile variable.
+          //  With fs.writeFile we write the json string into the so far empty data.json file.
+          // note: If you use JavaScript to develop applications, JavaScript objects have to be converted into strings if the data is to be stored in a database or a data file.
+          //  The same applies if you want to send data to an API or to a webserver. 
+          // The JSON.stringify() function does this for us.
+    
+          let dataToFile = JSON.stringify(data);
+    
+            fs.writeFile('./modules/data.json', dataToFile, function(err) {
+              if (err) throw err;
+              console.log('Intial User created');
+              });
+    
+          } else {
+            console.log('users are available');
+            var newID = data.users[data.users.length -1].id + 1;
+    
+            let newUser = {
+                name: req.body.name,
+                email: req.body.email,
+                password: req.body.password,
+                id: newID
+              };
+    
+          data.users.push(newUser);
+    
+          let dataToFile = JSON.stringify(data);
+    
+          fs.writeFile('./modules/data.json', dataToFile, function(err) {
+            if (err) throw err;
+            console.log('User added');
+            });
+          };
+      };
+ 
+    isAuthenticated = true;
+
+    res.redirect('/'); 
+  });
+
+
 app.get('/login', (req, res) => 
 {
     res.render('../views/pages/login');
 });
 
-app.post('/login', (req, res) => {
+app.post('/login', (req, res) => {     
     
+    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
+
+    if(!dataExp)
+        { 
+            console.log('No users regestred');
+            res.redirect('/register');
+        }
+    else {
+
+    let data = JSON.parse(dataExp);
+
     isAuthenticated = false;
 
     const {email, password} = req.body;
 
-    users.forEach((user) => {
+    data.users.forEach((user) => {
         
         if(user.email === email && user.password === password)
         {
             isAuthenticated = true;
         }
-    });
+        });
+    }
 
     if (isAuthenticated) {
 
@@ -111,7 +211,11 @@ app.get('/editor', (req, res) =>
     res.render('../views/pages/editor');
 });
 
-//upload link 
+app.get('/register', (req, res) =>
+{
+    res.render('../views/pages/register');
+});
+//upload img 
 app.post('/upload', (req, res) => {
     let file = req.files.image;
     let date = new Date();
@@ -135,12 +239,80 @@ app.post('/upload', (req, res) => {
 })
 
 app.post('/publish', (req, res) => {
-    
-    //Extract title and article from request body
-    let { title, article } = req.body;
 
+        let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
     
+        if(!dataExp) {
+          console.log('no data available');
+          data = {};
+          data.blogs = [];
 
+          let newBlogId = 1
+    
+          let newBlog = {
+            title: req.body.title,
+            author: req.body.author,
+            date: req.body.date,
+            id: newBlogId
+          };
+    
+        data.blogs.push(newBlog);
+    
+        let dataToFile = JSON.stringify(data);
+    
+          fs.writeFile('./modules/data.json', dataToFile, function(err) {
+            if (err) throw err;
+            console.log('Intial Blog created');
+            });
+    
+        } else {
+          var data = JSON.parse(dataExp)
+    
+          if (!data.blogs) {
+            console.log('no blog are available');
+            data.blogs = [];
+
+            let newBlogId = 1;
+    
+            let newBlog = {
+              title: req.body.title,
+              author: req.body.author,
+              date: req.body.date,
+              id: newBlogId
+            }
+    
+          data.blogs.push(newBlog);
+    
+          dataToFile = JSON.stringify(data);
+    
+            fs.writeFile('./modules/data.json', dataToFile, function(err) {
+              if (err) throw err;
+              console.log('Intial blog created');
+              });
+    
+          } else {
+            console.log('blogs are available');
+            let newID = data.users[users.length -1].id + 1;
+    
+            var newBlog = {
+              title: req.body.title,
+              author: req.body.author,
+              date: req.body.date,
+              id: newID
+            };
+    
+          data.blogs.push(newBlog);
+    
+          dataToFile = JSON.stringify(data);
+    
+          fs.writeFile('../modules/data.json', dataToFile, function(err) {
+            if (err) throw err;
+            console.log('blog added');
+            });
+          }
+      }
+    
+    res.sent('Post has been added');
 });
     
 

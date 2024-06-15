@@ -1,6 +1,6 @@
 import fs from "fs";
 
-const usersAdd = function(req, res){
+function UserAdd(req, res){
 
     //read the data from json file
     let dataExp = fs.readFileSync('./data.json', 'utf8');
@@ -99,4 +99,4 @@ const usersAdd = function(req, res){
   };
 };
 
-module.exports = usersAdd;
+module.exports = usersAdd();

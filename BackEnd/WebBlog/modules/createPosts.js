@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-const blogsAdd = function(req, res) {
+function blogsAdd(req, res) {
 
     var dataExp = fs.readFileSync('./data.json', 'utf8')
 
@@ -93,4 +93,3 @@ const blogsAdd = function(req, res) {
   }
 }
 
-module.exports = blogsAdd;

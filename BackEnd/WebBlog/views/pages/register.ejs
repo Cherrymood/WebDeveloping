@@ -17,9 +17,9 @@
 
 <header>
     <div class="wrapper">
-        <form action="/login" method="post">
+        <form action="/register" method="post">
           <h1 class="heading">
-              <span class="small">Login</span>
+              <span class="small">Register</span>
               to
               <span class="no-fill">Blog</span>
           </h1>
@@ -27,14 +27,16 @@
             <input type="text" name="email" required>
             <label>Enter your email</label>
           </div>
+        </h1>
+        <div class="input-field">
+        <input type="text" name="name" required>
+        <label>Enter your name</label>
+      </div>
           <div class="input-field">
             <input type="password" name="password" required>
             <label>Enter your password</label>
           </div>
-          <button type="submit">Log In</button>
-          <div class="register">
-            <p>Don't have an account? <a href="/register">Register</a></p>
-          </div>
+          <button type="submit">Register</button>
         </form>
       </div>
 </header>
