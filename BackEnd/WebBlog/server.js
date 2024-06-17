@@ -240,27 +240,25 @@ app.post('/upload', (req, res) => {
 
 app.post('/publish', (req, res) => {
 
-        let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
+    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
     
         if(!dataExp) {
           console.log('no data available');
           data = {};
           data.blogs = [];
-
-          let newBlogId = 1
+          let dateNow = new Date().getDate();
     
           let newBlog = {
             title: req.body.title,
-            author: req.body.author,
-            date: req.body.date,
-            id: newBlogId
+            author: req.body.article,
+            date: dateNow,
           };
     
         data.blogs.push(newBlog);
     
         let dataToFile = JSON.stringify(data);
     
-          fs.writeFile('./modules/data.json', dataToFile, function(err) {
+        fs.writeFile('./modules/data.json', dataToFile, function(err) {
             if (err) throw err;
             console.log('Intial Blog created');
             });
@@ -271,19 +269,17 @@ app.post('/publish', (req, res) => {
           if (!data.blogs) {
             console.log('no blog are available');
             data.blogs = [];
-
-            let newBlogId = 1;
+            let dateNow = new Date().getDate();
     
             let newBlog = {
-              title: req.body.title,
-              author: req.body.author,
-              date: req.body.date,
-              id: newBlogId
+                title: req.body.title,
+                author: req.body.article,
+                date: dateNow,
             }
     
           data.blogs.push(newBlog);
     
-          dataToFile = JSON.stringify(data);
+          let dataToFile = JSON.stringify(data);
     
             fs.writeFile('./modules/data.json', dataToFile, function(err) {
               if (err) throw err;
@@ -292,37 +288,27 @@ app.post('/publish', (req, res) => {
     
           } else {
             console.log('blogs are available');
-            let newID = data.users[users.length -1].id + 1;
+            let dateNow = new Date().getDate();
     
             var newBlog = {
-              title: req.body.title,
-              author: req.body.author,
-              date: req.body.date,
-              id: newID
+                title: req.body.title,
+                author: req.body.article,
+                date: dateNow,
             };
     
           data.blogs.push(newBlog);
     
-          dataToFile = JSON.stringify(data);
+          let dataToFile = JSON.stringify(data);
     
-          fs.writeFile('../modules/data.json', dataToFile, function(err) {
+          fs.writeFile('./modules/data.json', dataToFile, function(err) {
             if (err) throw err;
             console.log('blog added');
             });
           }
       }
-    
-    res.sent('Post has been added');
+    res.redirect('/'); 
 });
     
-
-// Route for serving the form page
-app.get('/editor', (req, res) => {
-    // Send the HTML file for the editor page
-    res.sendFile(path.join(__dirname, 'views/editor.html'));
-});
-
-
 
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
