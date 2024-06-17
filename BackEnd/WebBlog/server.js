@@ -16,8 +16,9 @@ app.use((req, res, next) => {
     res.locals.isAuthenticated = isAuthenticated;
     next();
 });
-const blogPosts = [];
-const users = [];
+
+let imagename = "";
+let imagepath = "";
 
 app.set('view engine', 'ejs');
 
@@ -25,7 +26,7 @@ let isAuthenticated = false;
 
 app.get('/', (req, res) => 
 {
-    res.render('../views/pages/home', { blogPosts, isAuthenticated});
+    res.render('../views/pages/home', { isAuthenticated });
 });
 
 app.get('/pages/:id', (req, res) =>
@@ -220,12 +221,12 @@ app.post('/upload', (req, res) => {
     let file = req.files.image;
     let date = new Date();
     //image name
-    let imagename = date.getDate() + date.getTime() + file.name;
+    imagename = date.getDate() + date.getTime() + file.name;
     //image upload path
-    let path = 'public/uploads/'+ imagename;
+    imagepath = 'public/uploads/'+ imagename;
 
     //create upload
-    file.mv(path, (err, result) => {
+    file.mv(imagepath, (err, result) => {
         if(err)
         {
             throw err;
@@ -241,17 +242,19 @@ app.post('/upload', (req, res) => {
 app.post('/publish', (req, res) => {
 
     let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
-    
+    let date = new Date();
+
         if(!dataExp) {
           console.log('no data available');
           data = {};
           data.blogs = [];
-          let dateNow = new Date().getDate();
     
           let newBlog = {
             title: req.body.title,
             author: req.body.article,
-            date: dateNow,
+            date: date.getDate() + date.getTime(),
+            image: imagename,
+            image_path: imagepath
           };
     
         data.blogs.push(newBlog);
@@ -269,12 +272,13 @@ app.post('/publish', (req, res) => {
           if (!data.blogs) {
             console.log('no blog are available');
             data.blogs = [];
-            let dateNow = new Date().getDate();
     
             let newBlog = {
                 title: req.body.title,
                 author: req.body.article,
-                date: dateNow,
+                date: date.getDate() + date.getTime(),
+                image: imagename,
+                image_path: imagepath
             }
     
           data.blogs.push(newBlog);
@@ -288,12 +292,13 @@ app.post('/publish', (req, res) => {
     
           } else {
             console.log('blogs are available');
-            let dateNow = new Date().getDate();
     
             var newBlog = {
                 title: req.body.title,
                 author: req.body.article,
-                date: dateNow,
+                date: date.getDate() + date.getTime(),
+                image: imagename,
+                image_path: imagepath
             };
     
           data.blogs.push(newBlog);
@@ -304,8 +309,12 @@ app.post('/publish', (req, res) => {
             if (err) throw err;
             console.log('blog added');
             });
-          }
-      }
+          };
+      };
+
+    imagename = "";
+    imagepath = "";
+
     res.redirect('/'); 
 });
     
