@@ -34,27 +34,14 @@ app.get('/', (req, res) =>
     res.render('../views/pages/home', { isAuthenticated, posts });
 });
 
-app.get('/post', (req, res) => {
+app.get('/edit_last_post', (req, res) => {
 
-    res.render('../views/pages/post', { isAuthenticated, data });
+    res.render('../views/pages/edit_last_post', { isAuthenticated });
 });
 
-app.get('/pages/:id', (req, res) =>
+app.get('/error', (req, res) => 
 {
-    const postId = req.params.id;
-
-    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
-
-    const post = data.blogs.find((post) => post[id] === postId);
-
-    if(post)
-    {
-        res.render(`../views/pages/post${post.id}`, { post, isAuthenticated })
-    }
-    else
-    {
-        res.redirect('../views/pages/error');
-    }
+    res.render('../views/pages/error');
 });
 
 app.get('/login', (req, res) => 
@@ -90,7 +77,7 @@ app.post('/upload', (req, res) => {
     file.mv(imagepath, (err, result) => {
         if(err)
         {
-            throw err;
+            res.redirect('../views/pages/error');
         }
         else
         {
@@ -121,9 +108,10 @@ app.post('/publish', (req, res) => {
         let dataToFile = JSON.stringify(data);
     
         fs.writeFile('./modules/data.json', dataToFile, function(err) {
-            if (err) throw err;
-            console.log('Intial Blog created');
-            });
+
+            if (err) {
+                res.redirect('../views/pages/error');
+              }});
     
         } else {
     
@@ -143,9 +131,9 @@ app.post('/publish', (req, res) => {
           let dataToFile = JSON.stringify(data);
     
             fs.writeFile('./modules/data.json', dataToFile, function(err) {
-              if (err) throw err;
-              console.log('Intial blog created');
-              });
+              if (err) {
+                res.redirect('../views/pages/error');
+              }});
     
           } else {
             console.log('blogs are available');
@@ -162,9 +150,9 @@ app.post('/publish', (req, res) => {
           let dataToFile = JSON.stringify(data);
     
           fs.writeFile('./modules/data.json', dataToFile, function(err) {
-            if (err) throw err;
-            console.log('blog added');
-            });
+            if (err) {
+                res.redirect('../views/pages/error');
+              }});
           };
       };
 
@@ -227,9 +215,9 @@ app.post('/register', (req, res) => {
         let dataToFile = JSON.stringify(data);
 
         fs.writeFile('./modules/data.json', dataToFile, function(err) {
-        if (err) throw err;
-        console.log('Intial User created');
-        });
+            if (err) {
+                res.redirect('../views/pages/error');
+              }});
 
     } else {
       // As we have seen we store a JSON string in the data file. So when we read the file and store the data into the variable dataExp we have JSON string data in that variable.
@@ -260,29 +248,39 @@ app.post('/register', (req, res) => {
       let dataToFile = JSON.stringify(data);
 
         fs.writeFile('./modules/data.json', dataToFile, function(err) {
-          if (err) throw err;
-          console.log('Intial User created');
-          });
+            if (err) {
+                res.redirect('../views/pages/error');
+              }});
 
       } else {
         console.log('users are available');
+
         var newID = data.users[data.users.length -1].id + 1;
 
-        let newUser = {
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            id: newID
-          };
+        users.forEach((user) => {
 
-      data.users.push(newUser);
+            if(user.email == req.body.email)
+            {
+                throw err;
+            }
+            else{
+
+            let newUser = {
+                name: req.body.name,
+                email: req.body.email,
+                password: req.body.password,
+                id: newID
+              };
+
+              data.users.push(newUser);}
+        })
 
       let dataToFile = JSON.stringify(data);
 
       fs.writeFile('./modules/data.json', dataToFile, function(err) {
-        if (err) throw err;
-        console.log('User added');
-        });
+        if (err) {
+            res.redirect('../views/pages/error');
+          }});
       };
   };
 
