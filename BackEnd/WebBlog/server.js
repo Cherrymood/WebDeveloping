@@ -14,19 +14,29 @@ app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
     res.locals.isAuthenticated = isAuthenticated;
+    res.locals.posts = posts;
     next();
 });
+app.set('view engine', 'ejs');
 
 let imagename = "";
-let imagepath = "";
-
-app.set('view engine', 'ejs');
 
 let isAuthenticated = false;
 
+let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
+let data = JSON.parse(dataExp);
+let users = data.users;
+let posts = data.blogs;
+console.log(posts);
+
 app.get('/', (req, res) => 
 {
-    res.render('../views/pages/home', { isAuthenticated });
+    res.render('../views/pages/home', { isAuthenticated, posts });
+});
+
+app.get('/post', (req, res) => {
+
+    res.render('../views/pages/post', { isAuthenticated, data });
 });
 
 app.get('/pages/:id', (req, res) =>
@@ -47,158 +57,9 @@ app.get('/pages/:id', (req, res) =>
     }
 });
 
-app.post('/comment/:id', (req, res) => {
-    const postId = req.params.id;
-
-    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
-
-    const post = data.blogs.find((post) => post[id] === postId);
-
-
-    if(post)
-        {
-            const comment = req.body.comment;
-
-            post.comments.push(comment);
-            
-            if(comment)
-            {
-                post.comments.push(comment);
-            }
-            return res.redirect(`../views/pages/${postId}`);
-        }
-    else
-        {
-            return res.redirect('../views/pages/error');
-        }
-});
-
-app.post('/register', (req, res) => {
-        //read the data from json file
-        let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
-
-        if(!dataExp)
-        {
-            console.log('no data availiable');
-            let data = {};
-            data.users = [];
-    
-            let newUser = {
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password,
-                id: 1
-              };
-    
-            data.users.push(newUser);
-    
-            let dataToFile = JSON.stringify(data);
-    
-            fs.writeFile('./modules/data.json', dataToFile, function(err) {
-            if (err) throw err;
-            console.log('Intial User created');
-            });
-    
-        } else {
-          // As we have seen we store a JSON string in the data file. So when we read the file and store the data into the variable dataExp we have JSON string data in that variable.
-          //  To process these data in our JavaScript code we must parse this JSON so that a JavaScript object is created from the JSON string.
-          //  This is what we do with the JSON.parse() function.
-          
-          let data = JSON.parse(dataExp);
-    
-          if(!data.users) {
-            console.log('no users are available')
-            data.users = []
-    
-            let newUser = {
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password,
-                id: 1
-              };
-    
-          data.users.push(newUser);
-    
-          // With JSON.stringify() we take the JavaScript data object, create a JSON string out of it and store this string into the dataToFile variable.
-          //  With fs.writeFile we write the json string into the so far empty data.json file.
-          // note: If you use JavaScript to develop applications, JavaScript objects have to be converted into strings if the data is to be stored in a database or a data file.
-          //  The same applies if you want to send data to an API or to a webserver. 
-          // The JSON.stringify() function does this for us.
-    
-          let dataToFile = JSON.stringify(data);
-    
-            fs.writeFile('./modules/data.json', dataToFile, function(err) {
-              if (err) throw err;
-              console.log('Intial User created');
-              });
-    
-          } else {
-            console.log('users are available');
-            var newID = data.users[data.users.length -1].id + 1;
-    
-            let newUser = {
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password,
-                id: newID
-              };
-    
-          data.users.push(newUser);
-    
-          let dataToFile = JSON.stringify(data);
-    
-          fs.writeFile('./modules/data.json', dataToFile, function(err) {
-            if (err) throw err;
-            console.log('User added');
-            });
-          };
-      };
- 
-    isAuthenticated = true;
-
-    res.redirect('/'); 
-  });
-
-
 app.get('/login', (req, res) => 
 {
     res.render('../views/pages/login');
-});
-
-app.post('/login', (req, res) => {     
-    
-    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
-
-    if(!dataExp)
-        { 
-            console.log('No users regestred');
-            res.redirect('/register');
-        }
-    else {
-
-    let data = JSON.parse(dataExp);
-
-    isAuthenticated = false;
-
-    const {email, password} = req.body;
-
-    data.users.forEach((user) => {
-        
-        if(user.email === email && user.password === password)
-        {
-            isAuthenticated = true;
-        }
-        });
-    }
-
-    if (isAuthenticated) {
-
-        res.redirect('/');
-
-    } else {
-
-        res.status(401).render('pages/error', { message: 'Invalid email or password' });
-    }
 });
 
 app.get('/logout', (req, res) => 
@@ -223,7 +84,7 @@ app.post('/upload', (req, res) => {
     //image name
     imagename = date.getDate() + date.getTime() + file.name;
     //image upload path
-    imagepath = 'public/uploads/'+ imagename;
+    let imagepath = 'public/uploads/'+ imagename;
 
     //create upload
     file.mv(imagepath, (err, result) => {
@@ -238,10 +99,9 @@ app.post('/upload', (req, res) => {
         }
     });
 })
-
+//publish post to json
 app.post('/publish', (req, res) => {
 
-    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
     let date = new Date();
 
         if(!dataExp) {
@@ -251,10 +111,9 @@ app.post('/publish', (req, res) => {
     
           let newBlog = {
             title: req.body.title,
-            author: req.body.article,
+            article: req.body.article,
             date: date.getDate() + date.getTime(),
             image: imagename,
-            image_path: imagepath
           };
     
         data.blogs.push(newBlog);
@@ -267,7 +126,6 @@ app.post('/publish', (req, res) => {
             });
     
         } else {
-          var data = JSON.parse(dataExp)
     
           if (!data.blogs) {
             console.log('no blog are available');
@@ -275,10 +133,9 @@ app.post('/publish', (req, res) => {
     
             let newBlog = {
                 title: req.body.title,
-                author: req.body.article,
+                article: req.body.article,
                 date: date.getDate() + date.getTime(),
                 image: imagename,
-                image_path: imagepath
             }
     
           data.blogs.push(newBlog);
@@ -295,10 +152,9 @@ app.post('/publish', (req, res) => {
     
             var newBlog = {
                 title: req.body.title,
-                author: req.body.article,
+                article: req.body.article,
                 date: date.getDate() + date.getTime(),
                 image: imagename,
-                image_path: imagepath
             };
     
           data.blogs.push(newBlog);
@@ -313,12 +169,151 @@ app.post('/publish', (req, res) => {
       };
 
     imagename = "";
-    imagepath = "";
 
     res.redirect('/'); 
 });
-    
 
+app.post('/login', (req, res) => {     
+
+    if(!dataExp)
+        { 
+            console.log('No users regestred');
+            res.redirect('/register');
+        }
+    else {
+
+    isAuthenticated = false;
+
+    const {email, password} = req.body;
+
+    data.users.forEach((user) => {
+        
+        if(user.email === email && user.password === password)
+        {
+            isAuthenticated = true;
+        }
+        });
+    }
+
+    if (isAuthenticated) {
+
+        res.redirect('/');
+
+    } else {
+
+        res.status(401).render('pages/error', { message: 'Invalid email or password' });
+    }
+});
+
+app.post('/register', (req, res) => {
+    //read the data from json file
+    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
+
+    if(!dataExp)
+    {
+        console.log('no data availiable');
+        let data = {};
+        data.users = [];
+
+        let newUser = {
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            id: 1
+          };
+
+        data.users.push(newUser);
+
+        let dataToFile = JSON.stringify(data);
+
+        fs.writeFile('./modules/data.json', dataToFile, function(err) {
+        if (err) throw err;
+        console.log('Intial User created');
+        });
+
+    } else {
+      // As we have seen we store a JSON string in the data file. So when we read the file and store the data into the variable dataExp we have JSON string data in that variable.
+      //  To process these data in our JavaScript code we must parse this JSON so that a JavaScript object is created from the JSON string.
+      //  This is what we do with the JSON.parse() function.
+      
+      let data = JSON.parse(dataExp);
+
+      if(!data.users) {
+        console.log('no users are available')
+        data.users = []
+
+        let newUser = {
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            id: 1
+          };
+
+      data.users.push(newUser);
+
+      // With JSON.stringify() we take the JavaScript data object, create a JSON string out of it and store this string into the dataToFile variable.
+      //  With fs.writeFile we write the json string into the so far empty data.json file.
+      // note: If you use JavaScript to develop applications, JavaScript objects have to be converted into strings if the data is to be stored in a database or a data file.
+      //  The same applies if you want to send data to an API or to a webserver. 
+      // The JSON.stringify() function does this for us.
+
+      let dataToFile = JSON.stringify(data);
+
+        fs.writeFile('./modules/data.json', dataToFile, function(err) {
+          if (err) throw err;
+          console.log('Intial User created');
+          });
+
+      } else {
+        console.log('users are available');
+        var newID = data.users[data.users.length -1].id + 1;
+
+        let newUser = {
+            name: req.body.name,
+            email: req.body.email,
+            password: req.body.password,
+            id: newID
+          };
+
+      data.users.push(newUser);
+
+      let dataToFile = JSON.stringify(data);
+
+      fs.writeFile('./modules/data.json', dataToFile, function(err) {
+        if (err) throw err;
+        console.log('User added');
+        });
+      };
+  };
+
+isAuthenticated = true;
+
+res.redirect('/'); 
+});
+
+app.post('/comment/:id', (req, res) => {
+    const postId = req.params.id;
+
+    const post = data.blogs.find((post) => post[id] === postId);
+
+    if(post)
+        {
+            const comment = req.body.comment;
+
+            post.comments.push(comment);
+            
+            if(comment)
+            {
+                post.comments.push(comment);
+            }
+            return res.redirect(`../views/pages/${postId}`);
+        }
+    else
+        {
+            return res.redirect('../views/pages/error');
+        }
+});
+    
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
 });
