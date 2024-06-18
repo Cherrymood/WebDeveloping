@@ -38,19 +38,23 @@
       
         <ul class="article-ul">
 
-          <% posts.forEach((post) => { %>
-            <li>
-              <a href="/post/<%= post.date %>">
+          <ul class="article-ul">
 
-                <span><%= post.title %></span>
-
-                <span class="article-list__date"><%= new Date(post.date).toDateString() %></span>
-
-              </a>
-
-            </li>
-
-          <% }) %>
+            <% if (!posts || posts.length === 0) { %>
+              <li>
+                <p>No posts</p>
+              </li>
+            <% } else { %>
+              <% posts.forEach((post) => { %>
+                <li>
+                  <a href="/post/<%= post.date %>">
+                    <span><%= post.title %></span>
+                    <span class="article-list__date"><%= new Date(post.date).toDateString() %></span>
+                  </a>
+                </li>
+              <% }) %>
+            <% } %>
+          </ul>
 
         </ul>
 
