@@ -248,8 +248,11 @@ app.post('/register', (req, res) => {
       let dataToFile = JSON.stringify(data);
 
         fs.writeFile('./modules/data.json', dataToFile, function(err) {
+
             if (err) {
+
                 res.redirect('../views/pages/error');
+                
               }});
 
       } else {
@@ -259,9 +262,9 @@ app.post('/register', (req, res) => {
 
         users.forEach((user) => {
 
-            if(user.email == req.body.email)
+            if(user.email == req.body.email || req.body.password.length < 6)
             {
-                throw err;
+                res.redirect('../views/pages/error');
             }
             else{
 
@@ -273,7 +276,7 @@ app.post('/register', (req, res) => {
               };
 
               data.users.push(newUser);}
-        })
+        });
 
       let dataToFile = JSON.stringify(data);
 

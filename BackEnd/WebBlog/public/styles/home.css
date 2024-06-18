@@ -43,16 +43,6 @@ body{
     color: #000;
 }
 
-.error
-{
-    
-    background: url(/img/error.jpg);
-    background-size: cover;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .link a {
     text-decoration: none; /* Remove underline from links */
     color: #686D76; /* Text color */
