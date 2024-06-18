@@ -90,18 +90,17 @@ app.post('/upload', (req, res) => {
 app.post('/publish', (req, res) => {
 
     let date = new Date();
+    let newBlog = {
+        title: req.body.title,
+        article: req.body.article,
+        date: date.getDate() + date.getTime(),
+        image: imagename,
+      };
 
         if(!dataExp) {
           console.log('no data available');
           data = {};
           data.blogs = [];
-    
-          let newBlog = {
-            title: req.body.title,
-            article: req.body.article,
-            date: date.getDate() + date.getTime(),
-            image: imagename,
-          };
     
         data.blogs.push(newBlog);
     
@@ -119,13 +118,6 @@ app.post('/publish', (req, res) => {
             console.log('no blog are available');
             data.blogs = [];
     
-            let newBlog = {
-                title: req.body.title,
-                article: req.body.article,
-                date: date.getDate() + date.getTime(),
-                image: imagename,
-            }
-    
           data.blogs.push(newBlog);
     
           let dataToFile = JSON.stringify(data);
@@ -137,13 +129,6 @@ app.post('/publish', (req, res) => {
     
           } else {
             console.log('blogs are available');
-    
-            var newBlog = {
-                title: req.body.title,
-                article: req.body.article,
-                date: date.getDate() + date.getTime(),
-                image: imagename,
-            };
     
           data.blogs.push(newBlog);
     
@@ -157,7 +142,7 @@ app.post('/publish', (req, res) => {
       };
 
     imagename = "";
-
+    posts.push(newBlog);
     res.redirect('/'); 
 });
 
