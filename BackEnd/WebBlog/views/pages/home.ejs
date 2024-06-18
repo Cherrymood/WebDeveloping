@@ -8,6 +8,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles/home.css">
+    <link rel="stylesheet" href="./styles/search-bar.css">
 
 </head>
 <body>
@@ -20,21 +21,20 @@
                 blog
                 <span class="no-fill">writing</span>
             </h1>
-            <a href="/editor" class="btn">write a blog</a>
+            <% if (locals.isAuthenticated) {%>
+                
+                <a href="/editor" class="btn">write a blog</a>
+
+            <%} else {%>
+
+                <a href="/login" class="btn">write a blog</a>
+
+            <% } %>
         </div>
     </header>
-        <ul>
-            <% blogPosts.forEach((post) => { %>
-                <li><a href="/pages/<%=post.id %>"><%=post.title %></a></li>
-                <% }); %>
-        </ul>
 
         <%- include('../partials/footer')%>
 
-<script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-firestore.js"></script>
-
-<script src="js/firebase.js"></script>
 <script src="js/home.js"></script>
 
 </body>
