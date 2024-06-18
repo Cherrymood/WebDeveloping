@@ -28,7 +28,7 @@ let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
 let users = data.users;
 let posts = data.blogs;
-let search_post;
+let search_post = null;
 console.log(posts);
 
 app.get('/', (req, res) => 
@@ -304,29 +304,33 @@ app.post('/comment/:id', (req, res) => {
 
 app.post('/search', (req, res) => {
 
-    let search = req.body.search;
+    let search = req.body.search.toLowerCase();
 
-    console.log(search);
+    console.log("search", search);
 
-    posts.forEach((post) =>{
+    posts.forEach((post) => {
 
-        if(post.title.toLowerCase() === search.toLowerCase())
-        {
+        post.title = post.title.toLowerCase();
+        
+        if (post.title === search) {
+            console.log("post.title", post.title);
             search_post = {
-            title: post.title,
-            article: post.article,
-            date: post.date,
-            image: post.image,
-            }
+                title: post.title,
+                article: post.article,
+                date: post.date,
+                image: post.image,
+            };
             console.log(search_post);
-
-            res.redirect('/search_post');
-        }
-        else {
-            // Handle the case when no post is found
-            res.send('No posts found with that title.');
         }
     });
+
+    if (search_post) {
+        // Store foundPost in session or other persistent storage
+        res.redirect('/search_post');
+    } else {
+        // Handle the case when no post is found
+        res.send('No posts found with that title.');
+    }
 });
     
 app.listen(port, () =>{
