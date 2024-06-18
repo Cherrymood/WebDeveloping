@@ -15,6 +15,7 @@ app.use(fileupload());
 app.use((req, res, next) => {
     res.locals.isAuthenticated = isAuthenticated;
     res.locals.posts = posts;
+    res.locals.search_post = search_post;
     next();
 });
 app.set('view engine', 'ejs');
@@ -27,6 +28,7 @@ let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
 let users = data.users;
 let posts = data.blogs;
+let search_post;
 console.log(posts);
 
 app.get('/', (req, res) => 
@@ -34,9 +36,9 @@ app.get('/', (req, res) =>
     res.render('../views/pages/home', { isAuthenticated, posts });
 });
 
-app.get('/edit_last_post', (req, res) => {
+app.get('/search_post', (req, res) => {
 
-    res.render('../views/pages/edit_last_post', { isAuthenticated });
+    res.render('../views/pages/search_post', { isAuthenticated });
 });
 
 app.get('/error', (req, res) => 
@@ -298,6 +300,33 @@ app.post('/comment/:id', (req, res) => {
         {
             return res.redirect('../views/pages/error');
         }
+});
+
+app.post('/search', (req, res) => {
+
+    let search = req.body.search;
+
+    console.log(search);
+
+    posts.forEach((post) =>{
+
+        if(post.title.toLowerCase() === search.toLowerCase())
+        {
+            search_post = {
+            title: post.title,
+            article: post.article,
+            date: post.date,
+            image: post.image,
+            }
+            console.log(search_post);
+
+            res.redirect('/search_post');
+        }
+        else {
+            // Handle the case when no post is found
+            res.send('No posts found with that title.');
+        }
+    });
 });
     
 app.listen(port, () =>{

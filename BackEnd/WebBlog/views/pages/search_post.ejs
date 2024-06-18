@@ -16,15 +16,15 @@
 
 <form action="/edit" method="post">
 
-    <div class="banner" style="background-image: url('uploads/<%= locals.posts[posts.length - 1].image %>');">
+    <div class="banner" style="background-image: url('uploads/<%= locals.search_post.image %>');">
        
         <input type="file" accept="image/*" id="banner-upload" hidden>
         <label for="banner-upload" class="banner-upload-btn"><img src="img/upload.png" alt="upload banner"></label>
     </div>
     
     <div class="blog">
-        <textarea type="text" class="title" name="title" placeholder="<%= locals.posts[posts.length -1].title %>" required></textarea>
-        <textarea type="text" class="article" name="article" placeholder="<%= locals.posts[posts.length -1].article %>" required></textarea>
+        <textarea type="text" class="title" name="title" placeholder="<%= locals.search_post.title %>" required></textarea>
+        <textarea type="text" class="article" name="article" placeholder="<%= locals.search_post.article %>" required></textarea>
     </div>
 
     <div class="blog-options">

@@ -19,20 +19,20 @@
         <% } %>
     </ul>
 
-     <div class="wrap">
+    <div class="wrap">
 
-        <div class="search">
+        <form action="/search" method="post">
 
-            <textarea type="text" class="searchTerm" name="title" placeholder="Search..."></textarea>
+          <div class="search">
+
+            <textarea class="searchTerm" name="search" placeholder="Search..."></textarea>
 
             <button type="submit" class="searchButton">
 
-             <i class="fa fa-search"></i>
-
-             Ok
-
-          </button>
-
-        </div>
-     </div>
+              <i class="fa fa-search"></i> Ok
+              
+            </button>
+          </div>
+        </form>
+      </div>
 </nav>
