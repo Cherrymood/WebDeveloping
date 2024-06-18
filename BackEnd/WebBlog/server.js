@@ -279,29 +279,6 @@ isAuthenticated = true;
 res.redirect('/'); 
 });
 
-app.post('/comment/:id', (req, res) => {
-    const postId = req.params.id;
-
-    const post = data.blogs.find((post) => post[id] === postId);
-
-    if(post)
-        {
-            const comment = req.body.comment;
-
-            post.comments.push(comment);
-            
-            if(comment)
-            {
-                post.comments.push(comment);
-            }
-            return res.redirect(`../views/pages/${postId}`);
-        }
-    else
-        {
-            return res.redirect('../views/pages/error');
-        }
-});
-
 app.post('/search', (req, res) => {
 
     let search = req.body.search.toLowerCase();
