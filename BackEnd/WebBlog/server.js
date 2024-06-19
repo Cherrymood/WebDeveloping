@@ -93,7 +93,6 @@ app.get('/post/:date', (req, res) => {
     // Render the post page (post.ejs) with post data
     res.render('../views/pages/post', { post: post, isAuthenticated });
   });
-
 //upload img 
 app.post('/upload', (req, res) => {
     let file = req.files.image;
@@ -300,28 +299,14 @@ app.post('/search', (req, res) => {
 
     let search = req.body.search.toLowerCase();
 
-    console.log("search", search);
-
     posts.forEach((post) => {
-        
+
         if (post.title.toLowerCase() === search) {
-            console.log("post.title", post.title);
-            search_post = {
-                title: post.title,
-                article: post.article,
-                date: post.date,
-                image: post.image,
-            };
+
+            res.render('../views/pages/post', { post: post, isAuthenticated });
         }
     });
-
-    if (search_post) {
-        // Store foundPost in session or other persistent storage
-        res.redirect('/search_post');
-    } else {
-        // Handle the case when no post is found
         res.send('No posts found with that title.');
-    }
 });
     
 app.listen(port, () =>{
