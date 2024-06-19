@@ -1,8 +1,6 @@
 import express from "express";
 import fileupload from "express-fileupload";
-import path from 'path';
 import fs from 'fs';
-import http from "http";
 
 const app = express();
 const port = 3000;
@@ -10,6 +8,7 @@ const port = 3000;
 app.use(express.urlencoded({extended: true}));
 
 app.use(express.static("./public"));
+app.use(express.static('./uploads'));
 app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
@@ -26,10 +25,23 @@ let isAuthenticated = false;
 
 let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
-let users = data.users;
-let posts = data.blogs;
-let search_post;
+let users = [];
+let posts = [];
+
+if(data.blogs)
+{
+    posts = data.blogs;
+}
+
+if(data.users)
+{
+    users = data.users;
+}
+
+let search_post = null;
+
 console.log(posts);
+
 
 app.get('/', (req, res) => 
 {
@@ -66,6 +78,21 @@ app.get('/register', (req, res) =>
 {
     res.render('../views/pages/register');
 });
+
+app.get('/post/:date', (req, res) => {
+
+    const postDate = req.params.date; 
+
+    const post = posts.find(p => p.date == postDate); 
+  
+    if (!post) {
+      res.status(404).send('Post not found');
+      return;
+    }
+
+    // Render the post page (post.ejs) with post data
+    res.render('../views/pages/post', { post: post, isAuthenticated });
+  });
 //upload img 
 app.post('/upload', (req, res) => {
     let file = req.files.image;
@@ -90,62 +117,51 @@ app.post('/upload', (req, res) => {
 })
 //publish post to json
 app.post('/publish', (req, res) => {
-
+    
     let date = new Date();
+
     let newBlog = {
         title: req.body.title,
         article: req.body.article,
-        date: date.getDate() + date.getTime(),
+        date: date.getTime(), // Using getTime() to get timestamp in milliseconds
         image: imagename,
-      };
+    };
 
-        if(!dataExp) {
-          console.log('no data available');
-          data = {};
-          data.blogs = [];
-    
-        data.blogs.push(newBlog);
-    
-        let dataToFile = JSON.stringify(data);
-    
-        fs.writeFile('./modules/data.json', dataToFile, function(err) {
+    // Check if data exists or initialize it
+    if (!data) {
+        console.log('No data available');
+        data = {
+            blogs: []
+        };
+    }
 
-            if (err) {
-                res.redirect('../views/pages/error');
-              }});
-    
+    // Check if blogs array exists or initialize it
+    if (!data.blogs) {
+        console.log('No blogs are available');
+        data.blogs = [];
+    }
+
+    // Push new blog into data.blogs array
+    data.blogs.push(newBlog);
+
+    // Convert data to JSON string
+    let dataToFile = JSON.stringify(data);
+
+    // Write data to data.json file
+    fs.writeFile('./modules/data.json', dataToFile, function(err) {
+        if (err) {
+            console.error('Error writing to data.json:', err);
+            res.redirect('../views/pages/error');
         } else {
-    
-          if (!data.blogs) {
-            console.log('no blog are available');
-            data.blogs = [];
-    
-          data.blogs.push(newBlog);
-    
-          let dataToFile = JSON.stringify(data);
-    
-            fs.writeFile('./modules/data.json', dataToFile, function(err) {
-              if (err) {
-                res.redirect('../views/pages/error');
-              }});
-    
-          } else {
-            console.log('blogs are available');
-    
-          data.blogs.push(newBlog);
-    
-          let dataToFile = JSON.stringify(data);
-    
-          fs.writeFile('./modules/data.json', dataToFile, function(err) {
-            if (err) {
-                res.redirect('../views/pages/error');
-              }});
-          };
-      };
-
-    imagename = "";
-    posts.push(newBlog);
-    res.redirect('/'); 
+            console.log('New blog added successfully');
+  
+            imagename = "";
+            
+            posts.push(newBlog);
+      
+            res.redirect('/');
+        }
+    });
 });
 
 app.post('/login', (req, res) => {     
@@ -279,54 +295,18 @@ isAuthenticated = true;
 res.redirect('/'); 
 });
 
-app.post('/comment/:id', (req, res) => {
-    const postId = req.params.id;
-
-    const post = data.blogs.find((post) => post[id] === postId);
-
-    if(post)
-        {
-            const comment = req.body.comment;
-
-            post.comments.push(comment);
-            
-            if(comment)
-            {
-                post.comments.push(comment);
-            }
-            return res.redirect(`../views/pages/${postId}`);
-        }
-    else
-        {
-            return res.redirect('../views/pages/error');
-        }
-});
-
 app.post('/search', (req, res) => {
 
-    let search = req.body.search;
+    let search = req.body.search.toLowerCase();
 
-    console.log(search);
+    posts.forEach((post) => {
 
-    posts.forEach((post) =>{
+        if (post.title.toLowerCase() === search) {
 
-        if(post.title.toLowerCase() === search.toLowerCase())
-        {
-            search_post = {
-            title: post.title,
-            article: post.article,
-            date: post.date,
-            image: post.image,
-            }
-            console.log(search_post);
-
-            res.redirect('/search_post');
-        }
-        else {
-            // Handle the case when no post is found
-            res.send('No posts found with that title.');
+            res.render('../views/pages/post', { post: post, isAuthenticated });
         }
     });
+        res.send('No posts found with that title.');
 });
     
 app.listen(port, () =>{

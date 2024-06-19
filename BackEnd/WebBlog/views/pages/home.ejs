@@ -7,8 +7,7 @@
     <title>Blog : Homepage</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles/home.css">
-    <link rel="stylesheet" href="./styles/search-bar.css">
+    <link rel="stylesheet" href="styles/home.css">
 
 </head>
 <body>
@@ -32,6 +31,37 @@
             <% } %>
         </div>
     </header>
+
+    <section class="articles">
+
+        <h2 class="articles__heading">Latest Posts</h2>
+      
+        <ul class="article-ul">
+
+          <ul class="article-ul">
+
+            <% if (!posts || posts.length === 0) { %>
+              <li>
+                <p>No posts</p>
+              </li>
+            <% } else { %>
+              
+              <% posts.forEach((post) => { %>
+
+                <li>
+
+                  <a href="/post/<%= post.date %>">
+
+                    <span><%= post.title %></span>
+
+                    <span class="article-list__date"><%= new Date(post.date).toDateString() %></span>
+                  </a>
+                </li>
+              <% }) %>
+            <% } %>
+          </ul>
+
+        </ul>
 
         <%- include('../partials/footer')%>
 
