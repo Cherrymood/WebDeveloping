@@ -13,10 +13,9 @@ app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
     res.locals.isAuthenticated = isAuthenticated;
-    res.locals.posts = posts;
-    res.locals.search_post = search_post;
     next();
 });
+
 app.set('view engine', 'ejs');
 
 let imagename = "";
@@ -25,23 +24,8 @@ let isAuthenticated = false;
 
 let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
-let users = [];
-let posts = [];
-
-if(data.blogs)
-{
-    posts = data.blogs;
-}
-
-if(data.users)
-{
-    users = data.users;
-}
-
-let search_post = null;
-
-console.log(posts);
-
+let users = data.users || [];
+let posts = data.blogs || [];
 
 app.get('/', (req, res) => 
 {
@@ -69,11 +53,6 @@ app.get('/logout', (req, res) =>
     res.redirect('/'); 
 });
 
-app.get('/editor', (req, res) =>
-{
-    res.render('../views/pages/editor');
-});
-
 app.get('/register', (req, res) =>
 {
     res.render('../views/pages/register');
@@ -93,6 +72,16 @@ app.get('/post/:date', (req, res) => {
     // Render the post page (post.ejs) with post data
     res.render('../views/pages/post', { post: post, isAuthenticated });
   });
+app.get('/editor', (req, res) =>
+{
+    if(req.isAuthenticated)
+    {
+        res.render('../views/pages/editor', { isAuthenticated: req.isAuthenticated });
+    }
+    else {
+        res.redirect('/login'); // Redirect to login page if not authenticated
+    }
+});
 //upload img 
 app.post('/upload', (req, res) => {
     let file = req.files.image;
