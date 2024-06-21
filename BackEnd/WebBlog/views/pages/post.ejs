@@ -29,6 +29,26 @@
 
     </div>
 
+    <div class="comments">
+        <h2>Add a Comment</h2>
+        <form action="/comment/<%= post.date %>" method="post">
+            <input type="text" name="comment" placeholder="Type your comment here..." required>
+            <button type="submit">Submit Comment</button>
+        </form>
+    </div>
+    
+    <% if (post.comments && post.comments.length > 0) { %>
+        <h2>Comments:</h2>
+        <ul>
+            <% post.comments.forEach(comment => { %>
+                <li><%= comment %></li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No comments yet. Be the first to comment!</p>
+    <% } %>
+    
+
     <script src="js/editor.js"></script>
   
 </body>
