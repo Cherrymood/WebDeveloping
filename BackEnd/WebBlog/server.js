@@ -13,6 +13,7 @@ app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
     res.locals.isAuthenticated = isAuthenticated;
+    res.locals.posts = posts;
     next();
 });
 
@@ -59,24 +60,26 @@ app.get('/register', (req, res) =>
 });
 
 app.get('/post/:date', (req, res) => {
+    const newData = fs.readFileSync('./modules/data.json', 'utf8');
+    const jsonData = JSON.parse(newData);
 
-    const postDate = req.params.date; 
+    const postDate = req.params.date;
+    
+    // Find the blog post by date
+    const post = jsonData.blogs.find(p => p.date == postDate);
 
-    const post = posts.find(p => p.date == postDate); 
-  
     if (!post) {
-      res.status(404).send('Post not found');
-      return;
+        res.status(404).send('Post not found');
+        return;
     }
-
-    // Render the post page (post.ejs) with post data
     res.render('../views/pages/post', { post: post, isAuthenticated });
-  });
+});
+
 app.get('/editor', (req, res) =>
 {
-    if(req.isAuthenticated)
+    if(isAuthenticated)
     {
-        res.render('../views/pages/editor', { isAuthenticated: req.isAuthenticated });
+        res.render('../views/pages/editor');
     }
     else {
         res.redirect('/login'); // Redirect to login page if not authenticated
@@ -114,6 +117,7 @@ app.post('/publish', (req, res) => {
         article: req.body.article,
         date: date.getTime(), // Using getTime() to get timestamp in milliseconds
         image: imagename,
+        comments: [],
     };
 
     // Check if data exists or initialize it
@@ -296,6 +300,52 @@ app.post('/search', (req, res) => {
         }
     });
         res.send('No posts found with that title.');
+});
+app.post('/comment/:date', (req, res) => {
+
+    if (!isAuthenticated) {
+        return res.redirect('/login');
+    }
+
+    // Read the current data from the file
+    const newData = fs.readFileSync('./modules/data.json', 'utf8');
+    const jsonData = JSON.parse(newData);
+    jsonData.blogs = jsonData.blogs.map(blog => {
+        blog.comments = blog.comments || [];
+        return blog;
+    });
+
+    const postDate = req.params.date;
+
+    const comment = req.body.comment;
+
+    if (!comment) {
+        return res.status(400).send('No comment provided');
+    }
+    // Find the blog post by date
+    const blogIndex = jsonData.blogs.findIndex(p => p.date == postDate);
+
+    if (blogIndex !== -1) {
+        
+        jsonData.blogs[blogIndex].comments.push(comment);
+        posts.comments = posts.comments || [];
+        posts.comments.push(comment);
+        console.log(posts);
+
+        // Write the updated data back to the file
+        try {
+            fs.writeFileSync('./modules/data.json', JSON.stringify(jsonData, null, 2), 'utf8');
+            console.log('File successfully updated.');
+        } catch (err) {
+            console.error('Error writing the file:', err);
+        }
+
+        res.redirect(`/post/${postDate}`);
+
+    } else {
+        console.error('Blog post not found');
+        return res.status(404).send('Blog post not found');
+    }
 });
     
 app.listen(port, () =>{
