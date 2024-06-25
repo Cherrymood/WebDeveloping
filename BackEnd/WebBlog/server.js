@@ -1,6 +1,8 @@
 import express from "express";
 import fileupload from "express-fileupload";
 import fs from 'fs';
+import bodyParser from "body-parser";
+import axios from "axios";
 
 const app = express();
 const port = 3000;
@@ -9,6 +11,7 @@ app.use(express.urlencoded({extended: true}));
 
 app.use(express.static("./public"));
 app.use(express.static('./uploads'));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
@@ -30,8 +33,26 @@ let posts = data.blogs || [];
 
 app.get('/', (req, res) => 
 {
-    res.render('../views/pages/home', { isAuthenticated, posts });
+    res.render('../views/pages/home', { isAuthenticated, posts, joke: "Waiting for data..."});
 });
+
+app.get('/joke', async (req, res) => {
+
+    try {
+        const result = await axios.get("https://v2.jokeapi.dev/joke/Programming?blacklistFlags=religious,political,racist,sexist");
+
+        res.render("../views/pages/joke.ejs", {
+
+          setup: result.data.setup,
+
+          delivery: result.data.delivery,
+
+        });
+      } catch (error) {
+        console.log(error.response.data);
+        res.status(500);
+      }
+    });
 
 app.get('/search_post', (req, res) => {
 
