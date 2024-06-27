@@ -30,13 +30,18 @@ let posts = data.blogs || [];
 
 app.get('/', async(req, res) => 
 { 
+    res.render("../views/pages/home.ejs");
+});
+
+app.get('/weather', async(req, res) => 
+{ 
     try {
         const result = await axios.get("http://api.openweathermap.org/geo/1.0/zip?zip=98059,US&appid=6a6e3894f2949202a2a0daacdf7f9832");
 
         const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${result.data.lat}&lon=${result.data.lon}&appid=6a6e3894f2949202a2a0daacdf7f9832`);
         console.log(weather.data);
 
-        res.render("../views/pages/home.ejs", {
+        res.render("../views/pages/weather.ejs", {
 
             temperature: weather.data.main.temp,
             weatherDescription: weather.data.weather[0].main,
