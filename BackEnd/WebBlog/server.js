@@ -8,7 +8,6 @@ const app = express();
 const port = 3000;
 
 app.use(express.urlencoded({extended: true}));
-
 app.use(express.static("./public"));
 app.use(express.static('./uploads'));
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -19,11 +18,9 @@ app.use((req, res, next) => {
     res.locals.posts = posts;
     next();
 });
-
 app.set('view engine', 'ejs');
 
 let imagename = "";
-
 let isAuthenticated = false;
 
 let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
@@ -31,9 +28,26 @@ let data = JSON.parse(dataExp);
 let users = data.users || [];
 let posts = data.blogs || [];
 
-app.get('/', (req, res) => 
-{
-    res.render('../views/pages/home', { isAuthenticated, posts, joke: "Waiting for data..."});
+app.get('/', async(req, res) => 
+{ 
+    try {
+        const result = await axios.get("http://api.openweathermap.org/geo/1.0/zip?zip=98059,US&appid=6a6e3894f2949202a2a0daacdf7f9832");
+
+        const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${result.data.lat}&lon=${result.data.lon}&appid=6a6e3894f2949202a2a0daacdf7f9832`);
+        console.log(weather.data);
+
+        res.render("../views/pages/home.ejs", {
+
+            temperature: weather.data.main.temp,
+            weatherDescription: weather.data.weather[0].main,
+            windSpeed: weather.data.wind.speed,
+            humidity: weather.data.main.humidity,
+        });
+    }
+    catch (error) {
+        console.log(error.response.data);
+        res.status(500);
+    }
 });
 
 app.get('/joke', async (req, res) => {
