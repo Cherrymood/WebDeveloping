@@ -38,11 +38,11 @@ app.get('/weather', async(req, res) =>
     try {
         const result = await axios.get("http://api.openweathermap.org/geo/1.0/zip?zip=98059,US&appid=6a6e3894f2949202a2a0daacdf7f9832");
 
-        const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${result.data.lat}&lon=${result.data.lon}&appid=6a6e3894f2949202a2a0daacdf7f9832`);
+        const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${result.data.lat}&lon=${result.data.lon}&appid=6a6e3894f2949202a2a0daacdf7f9832&units=metric`);
         console.log(weather.data);
 
         res.render("../views/pages/weather.ejs", {
-
+            icon: `https://openweathermap.org/img/wn/${weather.data.weather[0].icon}@2x.png`,
             temperature: weather.data.main.temp,
             weatherDescription: weather.data.weather[0].main,
             windSpeed: weather.data.wind.speed,
