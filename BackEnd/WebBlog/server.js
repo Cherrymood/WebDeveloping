@@ -1,14 +1,16 @@
 import express from "express";
 import fileupload from "express-fileupload";
 import fs from 'fs';
+import bodyParser from "body-parser";
+import axios from "axios";
 
 const app = express();
 const port = 3000;
 
 app.use(express.urlencoded({extended: true}));
-
 app.use(express.static("./public"));
 app.use(express.static('./uploads'));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
@@ -16,21 +18,83 @@ app.use((req, res, next) => {
     res.locals.posts = posts;
     next();
 });
-
 app.set('view engine', 'ejs');
 
 let imagename = "";
-
 let isAuthenticated = false;
+let yourkey = 'Zny6MhpNg3lYlhqE3Xv7AMZjuZG1i1nv';
 
 let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
 let users = data.users || [];
 let posts = data.blogs || [];
 
-app.get('/', (req, res) => 
-{
-    res.render('../views/pages/home', { isAuthenticated, posts });
+app.get('/', async(req, res) => 
+{ 
+    res.render("../views/pages/home.ejs");
+});
+//api archive nytimes
+app.get('/nytimes', async(req, res) => 
+{ 
+    res.render("../views/pages/nytimes.ejs");
+});
+
+app.post('/get-articles', async (req, res) => { 
+
+    const date = req.body.date;
+    const year_month = date.split('-');
+    console.log(year_month[1]);
+
+    try {
+        const response = await axios.get(`https://api.nytimes.com/svc/archive/v1/${year_month[0]}/${Number(year_month[1])}.json?api-key=${yourkey}`);
+        // console.log(response.data.response.docs);
+
+        res.render("../views/pages/nytimes_titles.ejs", {
+            response: response.data.response.docs,
+        });
+    } catch (error) {
+        console.log(error.response.data);
+        res.status(500).send('An error occurred while fetching articles.');
+    }
+});
+//weather api
+app.get('/weather', async(req, res) => 
+{ 
+    try {
+        const result = await axios.get("http://api.openweathermap.org/geo/1.0/zip?zip=98059,US&appid=6a6e3894f2949202a2a0daacdf7f9832");
+
+        const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${result.data.lat}&lon=${result.data.lon}&appid=6a6e3894f2949202a2a0daacdf7f9832&units=metric`);
+
+        res.render("../views/pages/weather.ejs", {
+            icon: `https://openweathermap.org/img/wn/${weather.data.weather[0].icon}@2x.png`,
+            temperature: weather.data.main.temp,
+            weatherDescription: weather.data.weather[0].main,
+            windSpeed: weather.data.wind.speed,
+            humidity: weather.data.main.humidity,
+        });
+    }
+    catch (error) {
+        console.log(error.response.data);
+        res.status(500);
+    }
+});
+//joke api
+app.get('/joke', async (req, res) => {
+
+    try {
+        const result = await axios.get("https://v2.jokeapi.dev/joke/Programming?blacklistFlags=religious,political,racist,sexist");
+
+        res.render("../views/pages/joke.ejs", {
+
+          setup: result.data.setup,
+
+          delivery: result.data.delivery,
+
+        });
+      } catch (error) {
+        console.log(error.response.data);
+        res.status(500);
+      }
 });
 
 app.get('/search_post', (req, res) => {
@@ -301,6 +365,7 @@ app.post('/search', (req, res) => {
     });
         res.send('No posts found with that title.');
 });
+
 app.post('/comment/:date', (req, res) => {
 
     if (!isAuthenticated) {
