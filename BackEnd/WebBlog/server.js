@@ -38,25 +38,6 @@ app.get('/nytimes', async(req, res) =>
 { 
     res.render("../views/pages/nytimes.ejs");
 });
-
-app.post('/get-articles', async (req, res) => { 
-
-    const date = req.body.date;
-    const year_month = date.split('-');
-    console.log(year_month[1]);
-
-    try {
-        const response = await axios.get(`https://api.nytimes.com/svc/archive/v1/${year_month[0]}/${Number(year_month[1])}.json?api-key=${yourkey}`);
-        // console.log(response.data.response.docs);
-
-        res.render("../views/pages/nytimes_titles.ejs", {
-            response: response.data.response.docs,
-        });
-    } catch (error) {
-        console.log(error.response.data);
-        res.status(500).send('An error occurred while fetching articles.');
-    }
-});
 //weather api
 app.get('/weather', async(req, res) => 
 { 
@@ -147,6 +128,24 @@ app.get('/editor', (req, res) =>
     }
     else {
         res.redirect('/login'); // Redirect to login page if not authenticated
+    }
+});
+app.post('/get-articles', async (req, res) => { 
+
+    const date = req.body.date;
+    const year_month = date.split('-');
+    console.log(year_month[1]);
+
+    try {
+        const response = await axios.get(`https://api.nytimes.com/svc/archive/v1/${year_month[0]}/${Number(year_month[1])}.json?api-key=${yourkey}`);
+        // console.log(response.data.response.docs);
+
+        res.render("../views/pages/nytimes_titles.ejs", {
+            response: response.data.response.docs,
+        });
+    } catch (error) {
+        console.log(error.response.data);
+        res.status(500).send('An error occurred while fetching articles.');
     }
 });
 //upload img 
