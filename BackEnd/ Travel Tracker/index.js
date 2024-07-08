@@ -21,7 +21,6 @@ app.use(express.static("public"));
 app.get("/", async (req, res) => {
 
   let result = await db.query("SELECT * FROM visited_countries")
-  console.log(result);
   let countries = [];
 
   result.rows.forEach((elem) => {
@@ -29,29 +28,29 @@ app.get("/", async (req, res) => {
   });
 
   res.render("index.ejs", {countries: countries, total: countries.length});
-  db.end();
+
 });
 
-// app.post("/add", async (req, res) => {
+app.post("/add", async (req, res) => {
 
-//   db.connect();
+  let name = req.body.country;
+  name.toLower();
 
-//   db.query(`INSERT INTO country VALUES ${req.body.country}`, (err, res) => {
+  let result = await db.query(
+    'SELECT country_code FROM countries WHERE LOWER(country_name) = $1', 
+    [name]);
 
-//   if(err)
-//   {
-//     console.log("Error execuring query", err.stack)
-//   }
-//   else
-//   {
-//     countries = res.rows;
-//   }
-//   db.end();
-//   })
+    if(result.rows.length !== 0)
+    {
+      const data = result.rows[0];
+      const countryCode = data.country_code;
 
-//   res.redirect("index.ejs", {countries: countries, total: countries.length});
+      await db.query("INSERT INTO visited_countries (country_code) VALUES ($1)",
+      [countryCode,]);
+    };
 
-// });
+  res.redirect("/");
+});
 
 
 app.listen(port, () => {
