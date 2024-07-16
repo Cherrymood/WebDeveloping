@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeetCode</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/login.css">
+    <link rel="stylesheet" href="./styles/sign_in.css">
+    <link rel="stylesheet" href="./styles/navbar.css">
+    <link rel="stylesheet" href="./styles/stat.css">
+
+</head>
+<body>
+  <table>
+      <thead>
+        <tr>
+          <th></th>
+          <% users.forEach(user => { %>
+              <th><%= user.name %></th>
+          <% }) %>
+        </tr>
+      </thead>
+      <tbody>
+          <tr>
+            <th>Total Solved</th>
+            <% users.forEach(user => { %>
+                <td class="right-align"><%= user.total_solved %></td>
+            <% }) %>
+          </tr>
+          <tr>
+            <th>Total Medium</th>
+            <% users.forEach(user => { %>
+                <td class="right-align"><%= user.total_medium %></td>
+            <% }) %>
+          </tr>
+          <tr>
+            <th>Total Hard</th>
+            <% users.forEach(user => { %>
+                <td class="right-align"><%= user.total_hard %></td>
+            <% }) %>
+          </tr>
+          <tr>
+            <th>Acceptance Rate</th>
+            <% users.forEach(user => { %>
+                <td class="right-align"><%= user.acceptance_rate %></td>
+            <% }) %>
+          </tr>
+          <tr>
+            <th>Rank</th>
+            <% users.forEach(user => { %>
+                <td class="right-align"><%= user.ranking %></td>
+            <% }) %>
+          </tr>
+      </tbody>
+    </table>
+</body>
+</html>

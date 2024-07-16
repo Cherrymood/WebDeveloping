@@ -11,6 +11,7 @@ const db = new pg.Client({
     user: "postgres",
     host: "localhost",
     database: "world",
+    database: "permalist",
     password: "qiwinewpass",
     port: 5432,
   });
@@ -38,6 +39,8 @@ let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
 let users = data.users || [];
 let posts = data.blogs || [];
+
+
 let currentUserId = 1;
 let usersTravel = [];
 
@@ -60,9 +63,82 @@ async function checkUser() {
     return usersTravel.find((user) => user.id == currentUserId);
   }
 
+//------------Travel tracker -----//
+app.get('/travel_tracker', async(req, res) => 
+  { 
+      const currentUser = await checkUser();
+      const countries = await checkVisisted();
+      res.render("../views/pages/travel_tracker.ejs", {
+        countries: countries,
+        total: countries.length,
+        users: usersTravel,
+        color: currentUser.color,
+      });
+  });
+  app.post("/add", async (req, res) => {
+    const input = req.body["country"];
+  
+    try {
+      const result = await db.query(
+        "SELECT country_code FROM countries WHERE LOWER(country_name) LIKE '%' || $1 || '%';",
+        [input.toLowerCase()]
+      );
+  
+      const data = result.rows[0];
+      const countryCode = data.country_code;
+      try {
+        await db.query(
+          "INSERT INTO visited_countries (country_code) VALUES ($1)",
+          [countryCode]
+        );
+        res.redirect("/");
+      } catch (err) {
+        console.log(err);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
+app.post("/user", async (req, res) => {
+
+    if(req.body.add === "new")
+    {
+      res.render("../views/pages/new.ejs");
+    }
+    else{
+      res.redirect("/travel_tracker");
+    }
+  });
+  
+app.post("/new", async (req, res) => {
+  
+    let color = req.body.color;
+  
+    let name = req.body.name;
+    
+    const result = await db.query(
+      "INSERT INTO users (name, color) VALUES($1, $2) RETURNING *;",
+      [name, color]
+    );
+    const id = result.rows[0].id;
+    console.log(result.rows[0].id);
+  
+    currentUserId = id;
+  
+    res.redirect("/travel_tracker");
+  
+  });
+//----------------------//
+
 app.get('/', async(req, res) => 
 { 
     res.render("../views/pages/home.ejs");
+});
+
+app.get('/stat', async(req, res) => 
+{ 
+    res.render("../views/pages/leetcode/stat.ejs");
 });
 //api archive nytimes
 app.get('/nytimes', async(req, res) => 
@@ -70,16 +146,9 @@ app.get('/nytimes', async(req, res) =>
     res.render("../views/pages/nytimes.ejs");
 });
 
-app.get('/travel_tracker', async(req, res) => 
+app.get('/get_stat', async(req, res) => 
 { 
-    const currentUser = await checkUser();
-    const countries = await checkVisisted();
-    res.render("../views/pages/travel_tracker.ejs", {
-      countries: countries,
-      total: countries.length,
-      users: usersTravel,
-      color: currentUser.color,
-    });
+    res.render("../views/pages/leetcode/get_stat.ejs");
 });
 //weather api
 app.get('/weather', async(req, res) => 
@@ -174,61 +243,6 @@ app.get('/editor', (req, res) =>
     }
 });
 
-app.post("/add", async (req, res) => {
-    const input = req.body["country"];
-  
-    try {
-      const result = await db.query(
-        "SELECT country_code FROM countries WHERE LOWER(country_name) LIKE '%' || $1 || '%';",
-        [input.toLowerCase()]
-      );
-  
-      const data = result.rows[0];
-      const countryCode = data.country_code;
-      try {
-        await db.query(
-          "INSERT INTO visited_countries (country_code) VALUES ($1)",
-          [countryCode]
-        );
-        res.redirect("/");
-      } catch (err) {
-        console.log(err);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
-
-app.post("/user", async (req, res) => {
-
-    if(req.body.add === "new")
-    {
-      res.render("../views/pages/new.ejs");
-    }
-    else{
-      res.redirect("/travel_tracker");
-    }
-  });
-  
-app.post("/new", async (req, res) => {
-  
-    let color = req.body.color;
-  
-    let name = req.body.name;
-    
-    const result = await db.query(
-      "INSERT INTO users (name, color) VALUES($1, $2) RETURNING *;",
-      [name, color]
-    );
-    const id = result.rows[0].id;
-    console.log(result.rows[0].id);
-  
-    currentUserId = id;
-  
-    res.redirect("/travel_tracker");
-  
-  });
-
 app.post('/get-articles', async (req, res) => { 
 
     const date = req.body.date;
@@ -317,6 +331,54 @@ app.post('/publish', (req, res) => {
             res.redirect('/');
         }
     });
+});
+
+app.post('/leetcode', async (req, res) => {
+    const user = req.body.userName;
+    console.log(user);
+
+    let response = {};
+
+    try {
+        response = await axios.get(`https://leetcode-stats-api.herokuapp.com/${user}`);
+
+        if (response.data.status !== 'error') {
+            // Insert the user into leetcode_user
+            try {
+                await db.query(
+                    "INSERT INTO leetcode_user (name) VALUES($1);",
+                    [user]
+                );
+            } catch (error) {
+                if (error.code === '23505') { // Unique violation error code in PostgreSQL
+                    console.log('Username already exists');
+                } else {
+                    throw error;
+                }
+            }
+
+            // Insert the stats into leetcode_score
+            await db.query(
+                "INSERT INTO leetcode_score (total_solved, total_medium, total_hard, acceptance_rate, ranking) VALUES($1, $2, $3, $4, $5);",
+                [response.data.totalSolved, response.data.mediumSolved, response.data.hardSolved, response.data.acceptanceRate, response.data.ranking]
+            );
+
+            // Query the combined results
+            const result = await db.query(
+                "SELECT leetcode_user.id, leetcode_user.name, leetcode_score.total_solved, leetcode_score.total_medium, leetcode_score.total_hard, leetcode_score.acceptance_rate, leetcode_score.ranking " +
+                "FROM leetcode_user " +
+                "INNER JOIN leetcode_score ON leetcode_user.id = leetcode_score.id " +
+                "ORDER BY leetcode_score.ranking;"
+            );
+
+            res.render('../views/pages/leetcode/stat', { users: result.rows });
+        } else {
+            res.status(400).send('User not found or error in fetching data.');
+        }
+    } catch (error) {
+        console.error('Error fetching LeetCode data:', error);
+        res.status(500).send('An error occurred while fetching LeetCode data.');
+    }
 });
 
 app.post('/login', (req, res) => {     
