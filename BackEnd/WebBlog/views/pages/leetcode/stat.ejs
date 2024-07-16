@@ -15,46 +15,79 @@
 </head>
 <body>
   <table>
-      <thead>
+    <thead>
         <tr>
-          <th></th>
-          <% users.forEach(user => { %>
-              <th><%= user.name %></th>
-          <% }) %>
+            <th></th>
+            <% if (users.length > 0) { %>
+                <% users.forEach(user => { %>
+                    <th><%= user.name %></th>
+                <% }) %>
+                <th class="add-item">
+                    <form class="add-item" action="/add_name" method="post">
+                        <div class="input-group">
+                            <input type="text" name="userName" placeholder="New Name" autocomplete="off" autofocus />
+                            <button class="add" type="submit" name="list" value="text">+</button>
+                        </div>
+                    </form>
+                </th>
+            <% } else { %>
+                <th>No users found</th>
+
+                <th class="add-item">
+                  <form class="add-item" action="/add_name" method="post">
+                      <div class="input-group">
+                          <input type="text" name="userName" placeholder="New Name" autocomplete="off" autofocus />
+                          <button class="add" type="submit" name="list" value="text">+</button>
+                      </div>
+                  </form>
+              </th>
+            <% } %>
         </tr>
-      </thead>
-      <tbody>
-          <tr>
-            <th>Total Solved</th>
-            <% users.forEach(user => { %>
-                <td class="right-align"><%= user.total_solved %></td>
-            <% }) %>
-          </tr>
-          <tr>
-            <th>Total Medium</th>
-            <% users.forEach(user => { %>
-                <td class="right-align"><%= user.total_medium %></td>
-            <% }) %>
-          </tr>
-          <tr>
-            <th>Total Hard</th>
-            <% users.forEach(user => { %>
-                <td class="right-align"><%= user.total_hard %></td>
-            <% }) %>
-          </tr>
-          <tr>
-            <th>Acceptance Rate</th>
-            <% users.forEach(user => { %>
-                <td class="right-align"><%= user.acceptance_rate %></td>
-            <% }) %>
-          </tr>
-          <tr>
-            <th>Rank</th>
-            <% users.forEach(user => { %>
-                <td class="right-align"><%= user.ranking %></td>
-            <% }) %>
-          </tr>
-      </tbody>
-    </table>
+    </thead>
+    <tbody>
+        <% if (users.length > 0) { %>
+            <tr>
+                <th>Total Solved</th>
+                <% users.forEach(user => { %>
+                    <td class="right-align"><%= user.total_solved %></td>
+                <% }) %>
+                <td></td>
+            </tr>
+
+            <tr>
+                <th>Total Medium</th>
+                <% users.forEach(user => { %>
+                    <td class="right-align"><%= user.total_medium %></td>
+                <% }) %>
+                <td></td>
+            </tr>
+
+            <tr>
+                <th>Total Hard</th>
+                <% users.forEach(user => { %>
+                    <td class="right-align"><%= user.total_hard %></td>
+                <% }) %>
+                <td></td>
+            </tr>
+
+            <tr>
+                <th>Acceptance Rate</th>
+                <% users.forEach(user => { %>
+                    <td class="right-align"><%= user.acceptance_rate %></td>
+                <% }) %>
+                <td></td>
+            </tr>
+
+            <tr>
+                <th>Rank</th>
+                <% users.forEach(user => { %>
+                    <td class="right-align"><%= user.ranking %></td>
+                <% }) %>
+                <td></td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
 </body>
 </html>

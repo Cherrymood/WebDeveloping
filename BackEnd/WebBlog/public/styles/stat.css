@@ -1,45 +1,76 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f496;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
-
-table {
-    border-collapse: collapse;
+    background-color: #f0f0f0;
+    padding: 20px;
+  }
+  
+  table {
     width: auto;
-    margin: 20px auto;
-    background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    overflow: hidden;
-
-}
-
-th, td {
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-}
-
-th {
-    background-color: #333;
-    color: #fff;
-    font-weight: 600;
-}
-
-tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-.left-align {
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+  
+  th, td {
+    padding: 10px;
     text-align: left;
-}
-
-.right-align {
+    border: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
+  .item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .item input[type="text"] {
+    padding: 8px;
+    width: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  .item button.add {
+    padding: 8px 8px;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .item button.add:hover {
+    background-color: #45a049;
+  }
+  
+  .right-align {
     text-align: center;
-}
+    color: #f2f2f2;
+  }
+  
+  .add-item {
+    background-color: #f2f2f2;
+  }
+  
+  .add-item form {
+    display: flex;
+    align-items: center;
+  }
+  
+  .add-item form input[type="text"] {
+    padding: 8px;
+    width: auto;
+  }
+  
+  .add-item form button.add {
+    padding: 6px;
+    width: 36px;
+    background-color: #4caf4f77;
+    color: white;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+  }
+  
+  .add-item form button.add:hover {
+    background-color: #45a049;
+  }
+  

@@ -136,19 +136,29 @@ app.get('/', async(req, res) =>
     res.render("../views/pages/home.ejs");
 });
 
-app.get('/stat', async(req, res) => 
-{ 
-    res.render("../views/pages/leetcode/stat.ejs");
+app.get('/stat', async (req, res) => {
+    try {
+        const result = await db.query(
+            "SELECT * FROM leetcode_stat " +
+            "ORDER BY leetcode_stat.ranking;"
+        );
+
+        if (!result.rows || result.rows.length === 0) {
+            return res.render('../views/pages/leetcode/stat', { users: {}});
+        }
+
+        res.render('../views/pages/leetcode/stat', { users: result.rows });
+
+    } catch (error) {
+        console.error('Error fetching LeetCode statistics:', error);
+        res.status(500).send('An error occurred while fetching LeetCode statistics.');
+    }
 });
+
 //api archive nytimes
 app.get('/nytimes', async(req, res) => 
 { 
     res.render("../views/pages/nytimes.ejs");
-});
-
-app.get('/get_stat', async(req, res) => 
-{ 
-    res.render("../views/pages/leetcode/get_stat.ejs");
 });
 //weather api
 app.get('/weather', async(req, res) => 
@@ -333,22 +343,31 @@ app.post('/publish', (req, res) => {
     });
 });
 
-app.post('/leetcode', async (req, res) => {
+// Handle POST request to '/add'
+app.post('/add_name', async (req, res) => {
+    
     const user = req.body.userName;
-    console.log(user);
-
-    let response = {};
-
+    
     try {
-        response = await axios.get(`https://leetcode-stats-api.herokuapp.com/${user}`);
+        // Fetch data from external API
+        const response = await axios.get(`https://leetcode-stats-api.herokuapp.com/${user}`);
 
         if (response.data.status !== 'error') {
-            // Insert the user into leetcode_user
+            // Insert the user into leetcode_user if not already exists
             try {
                 await db.query(
-                    "INSERT INTO leetcode_user (name) VALUES($1);",
-                    [user]
-                );
+                    "INSERT INTO leetcode_stat (name, total_solved, total_medium, total_hard, acceptance_rate, ranking) " +
+                "VALUES ($1, $2, $3, $4, $5, $6) " +
+                "ON CONFLICT (name) DO UPDATE " +
+                "SET total_solved = EXCLUDED.total_solved, " +
+                "    total_medium = EXCLUDED.total_medium, " +
+                "    total_hard = EXCLUDED.total_hard, " +
+                "    acceptance_rate = EXCLUDED.acceptance_rate, " +
+                "    ranking = EXCLUDED.ranking " +
+                "WHERE leetcode_stat.name = $1;", // <-- Corrected SQL query
+                [user, response.data.totalSolved, response.data.mediumSolved, response.data.hardSolved, response.data.acceptanceRate, response.data.ranking]
+            );
+                
             } catch (error) {
                 if (error.code === '23505') { // Unique violation error code in PostgreSQL
                     console.log('Username already exists');
@@ -357,24 +376,18 @@ app.post('/leetcode', async (req, res) => {
                 }
             }
 
-            // Insert the stats into leetcode_score
-            await db.query(
-                "INSERT INTO leetcode_score (total_solved, total_medium, total_hard, acceptance_rate, ranking) VALUES($1, $2, $3, $4, $5);",
-                [response.data.totalSolved, response.data.mediumSolved, response.data.hardSolved, response.data.acceptanceRate, response.data.ranking]
-            );
-
             // Query the combined results
             const result = await db.query(
-                "SELECT leetcode_user.id, leetcode_user.name, leetcode_score.total_solved, leetcode_score.total_medium, leetcode_score.total_hard, leetcode_score.acceptance_rate, leetcode_score.ranking " +
-                "FROM leetcode_user " +
-                "INNER JOIN leetcode_score ON leetcode_user.id = leetcode_score.id " +
-                "ORDER BY leetcode_score.ranking;"
+                "SELECT * FROM leetcode_stat " +
+                "ORDER BY leetcode_stat.ranking;"
             );
 
-            res.render('../views/pages/leetcode/stat', { users: result.rows });
+            res.redirect('../views/pages/leetcode/stat', { users: result.rows });
+
         } else {
             res.status(400).send('User not found or error in fetching data.');
         }
+
     } catch (error) {
         console.error('Error fetching LeetCode data:', error);
         res.status(500).send('An error occurred while fetching LeetCode data.');
