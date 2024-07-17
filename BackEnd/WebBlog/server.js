@@ -64,6 +64,7 @@ async function checkUser() {
   }
 
 //------------Travel tracker -----//
+
 app.get('/travel_tracker', async(req, res) => 
   { 
       const currentUser = await checkUser();
@@ -322,7 +323,6 @@ app.post('/get-articles', async (req, res) => {
 
     const date = req.body.date;
     const year_month = date.split('-');
-    console.log(year_month[1]);
 
     try {
         const response = await axios.get(`https://api.nytimes.com/svc/archive/v1/${year_month[0]}/${Number(year_month[1])}.json?api-key=${yourkey}`);

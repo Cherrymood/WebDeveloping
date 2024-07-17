@@ -20,22 +20,29 @@
         <th></th>
         <% if (users.length > 0) { %>
             <% users.forEach(user => { %>
+                
               <th>
                 <%= user.name %>
-                <div class="item">
-                    <form action="/deleteUser" method="post">
-                      <input type="checkbox" onchange="this.form.submit()" name="deleteUser" value="<%= user.name %>">
-                    </form>
-                </div>
                 
-                <form class="edit" action="/edit" method="post" style="display:inline;">
+                <form class="edit" action="/edit" method="post">
                     <input type="hidden" name="update_user" value="<%= user.name %>">
                     <input id="input<%= user.name %>" type="text" name="updatedItem" placeholder="Edit name" autocomplete="off" autofocus="true" hidden />
-                    <button id="done<%= user.name %>" class="edit" type="submit" hidden><img class="icon" src="/assets/icons/check-solid.svg" alt="tick image"></button>
+                    <button id="done<%= user.name %>" class="edit" type="submit" hidden><img class="icon" src="/img/edit.png" alt="tick image"></button>
                 </form>
-                <button id="edit<%= user.name %>" class="edit" onclick="handler('<%= user.name %>')"><img class="icon" src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
+
+                <button id="edit<%= user.name %>" class="edit" onclick="handler('<%= user.name %>')"><img class="icon" src="/img/edit.png" alt="pencil image"></button>
+            
+                <div class="delete">
+                <form action="/deleteUser" method="post">
+                    <input type="checkbox" id="delete<%= user.name %>" onchange="this.form.submit()" name="deleteUser" value="<%= user.name %>">
+                    <label for="delete<%= user.name %>">
+                    <img src="/img/delete.png" alt="delete icon" class="checkbox-image">
+                    </label>
+                </form>
+            </div>
             </th>
             <% }) %>
+
             <th class="add-item">
                 <form class="add-item" action="/add_name" method="post">
                     <div class="input-group" id="inputGroupNewUser" style="display: none;">
@@ -45,6 +52,7 @@
                     <button id="addNewUserBtn" class="add" type="button" onclick="toggleAddNewUser()">+</button>
                 </form>
             </th>
+
         <% } else { %>
             <th>No users found</th>
             <th class="add-item">

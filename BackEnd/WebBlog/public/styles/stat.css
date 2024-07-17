@@ -1,104 +1,168 @@
+/* Global Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    padding: 20px;
-  }
-  
-  table {
-    width: auto;
-    border-collapse: collapse;
-    margin-bottom: 10px;
-  }
-  
-  th, td {
-    padding: 10px;
-    text-align: left;
-    border: 1px solid #ddd;
-  }
-  
-  th {
-    background-color: #f2f2f2;
-  }
-  
-  .item {
-    display: flex;
-    align-items: center;
-  }
-  
-  .item input[type="text"] {
-    padding: 8px;
-    width: 10px;
-    border: 1px solid #ccc;
-  }
-  
-  .item button.add {
-    padding: 8px 8px;
-    background-color: #4CAF50;
-    color: white;
-    cursor: pointer;
-  }
-  
-  .item button.add:hover {
-    background-color: #45a049;
-  }
-  
-  .right-align {
-    text-align: center;
-    color: #f2f2f2;
-  }
-  
-  .add-item {
-    background-color: #f2f2f2;
-  }
-  
-  .add-item form {
-    display: flex;
-    align-items: center;
-  }
-  
-  .add-item form input[type="text"] {
-    padding: 8px;
-    width: auto;
-  }
-  
-  .add-item form button.add {
-    padding: 6px;
-    width: 36px;
-    background-color: #4caf4f77;
-    color: white;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
-  }
-  
-  .add-item form button.add:hover {
-    background-color: #45a049;
-  }
-  
-  .icon {
-    width: 16px;
-    height: 16px;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+
 }
 
-.edit {
-    background: none;
-    border: none;
-    cursor: pointer;
+/* Table Styles */
+table {
+  border-collapse: collapse;
+  width: fit-content;
+  margin: 20px 0;
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
-.add {
-  background-color: #4CAF50;
+th, td {
+  text-align: left;
+  padding: 16px;
+  font-size: 16px;
+}
+
+th {
+  background-color: #E9C46A;
+  color: #939185;
+}
+
+td {
+  border: 1px solid #e0e0e0;
+}
+
+td.right-align {
+  text-align: center;
+}
+
+/* Headings */
+thead th {
+  background-color: #4f554f;
   color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.add:hover {
+/* Form Styles */
+form {
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+
+form.edit {
+  display: inline-flex;
+  align-items: center;
+}
+
+form .input-group {
+  display: flex;
+  align-items: center;
+}
+
+form .input-group input {
+  border: 1px solid #e0e0e0;
+  border-radius: 5px 0 0 5px;
+  padding: 10px;
+  font-size: 16px;
+}
+
+form .input-group button {
+  border: 1px solid #e0e0e0;
+  border-left: none;
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+form .input-group button:hover {
   background-color: #45a049;
 }
 
-.input-group {
+/* Icons */
+.icon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+button.edit {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+button.edit:hover .icon {
+  filter: brightness(0.8);
+}
+
+/* Add New User Button */
+.add-item {
+  text-align: center;
+}
+
+button.add {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button.add:hover {
+  background-color: #45a049;
+}
+
+/* Hide the default checkbox */
+input[type="checkbox"] {
+  display: none;
+}
+
+.delete {
   display: flex;
-  align-items: center;
+  justify-content: center; 
+  align-items: center; 
+}
+
+/* Style the custom checkbox label */
+.checkbox-image {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  
+}
+
+/* Change the image when the checkbox is checked */
+input[type="checkbox"]:checked + label .checkbox-image {
+  filter: brightness(3); /* Darken the image on checked */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  table {
+      width: 100%;
+  }
+
+  th, td {
+      font-size: 14px;
+      padding: 12px;
+  }
+
+  form .input-group input {
+      padding: 8px;
+  }
+
+  form .input-group button {
+      padding: 8px;
+  }
 }
