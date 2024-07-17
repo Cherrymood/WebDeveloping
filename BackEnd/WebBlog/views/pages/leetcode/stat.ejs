@@ -16,33 +16,42 @@
 <body>
   <table>
     <thead>
-        <tr>
-            <th></th>
-            <% if (users.length > 0) { %>
-                <% users.forEach(user => { %>
-                    <th><%= user.name %></th>
-                <% }) %>
-                <th class="add-item">
-                    <form class="add-item" action="/add_name" method="post">
-                        <div class="input-group">
-                            <input type="text" name="userName" placeholder="New Name" autocomplete="off" autofocus />
-                            <button class="add" type="submit" name="list" value="text">+</button>
-                        </div>
-                    </form>
-                </th>
-            <% } else { %>
-                <th>No users found</th>
-
-                <th class="add-item">
-                  <form class="add-item" action="/add_name" method="post">
-                      <div class="input-group">
-                          <input type="text" name="userName" placeholder="New Name" autocomplete="off" autofocus />
-                          <button class="add" type="submit" name="list" value="text">+</button>
-                      </div>
-                  </form>
-              </th>
-            <% } %>
-        </tr>
+      <tr>
+        <th></th>
+        <% if (users.length > 0) { %>
+            <% users.forEach(user => { %>
+              <th>
+                <%= user.name %>
+                <form class="edit" action="/edit" method="post" style="display:inline;">
+                    <input type="hidden" name="update_user" value="<%= user.name %>">
+                    <input id="input<%= user.name %>" type="text" name="updatedItem" placeholder="Edit name" autocomplete="off" autofocus="true" hidden />
+                    <button id="done<%= user.name %>" class="edit" type="submit" hidden><img class="icon" src="/assets/icons/check-solid.svg" alt="tick image"></button>
+                </form>
+                <button id="edit<%= user.name %>" class="edit" onclick="handler('<%= user.name %>')"><img class="icon" src="/assets/icons/pencil-solid.svg" alt="pencil image"></button>
+            </th>
+            <% }) %>
+            <th class="add-item">
+                <form class="add-item" action="/add_name" method="post">
+                    <div class="input-group" id="inputGroupNewUser" style="display: none;">
+                        <input type="text" id="newUserName" name="userName" placeholder="New Name" autocomplete="off" autofocus />
+                        <button class="add" type="submit" name="list" value="text">+</button>
+                    </div>
+                    <button id="addNewUserBtn" class="add" type="button" onclick="toggleAddNewUser()">+</button>
+                </form>
+            </th>
+        <% } else { %>
+            <th>No users found</th>
+            <th class="add-item">
+                <form class="add-item" action="/add_name" method="post">
+                    <div class="input-group" id="inputGroupNewUser" style="display: none;">
+                        <input type="text" id="newUserName" name="userName" placeholder="New Name" autocomplete="off" autofocus />
+                        <button class="add" type="submit" name="list" value="text">+</button>
+                    </div>
+                    <button id="addNewUserBtn" class="add" type="button" onclick="toggleAddNewUser()">+</button>
+                </form>
+            </th>
+        <% } %>
+      </tr>
     </thead>
     <tbody>
         <% if (users.length > 0) { %>
@@ -90,4 +99,20 @@
 </table>
 
 </body>
+<script>
+  function handler(itemId) {
+      document.getElementById('input' + itemId).hidden = false;
+      document.getElementById('done' + itemId).hidden = false;
+      document.getElementById('edit' + itemId).hidden = true;
+  }
+  
+  function toggleAddNewUser() {
+      const inputGroup = document.getElementById('inputGroupNewUser');
+      const addNewUserBtn = document.getElementById('addNewUserBtn');
+      inputGroup.style.display = inputGroup.style.display === 'none' ? 'flex' : 'none';
+      addNewUserBtn.style.display = addNewUserBtn.style.display === 'none' ? 'block' : 'none';
+  }
+  </script>
+  
+  
 </html>
