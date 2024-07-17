@@ -22,6 +22,12 @@
             <% users.forEach(user => { %>
               <th>
                 <%= user.name %>
+                <div class="item">
+                    <form action="/deleteUser" method="post">
+                      <input type="checkbox" onchange="this.form.submit()" name="deleteUser" value="<%= user.name %>">
+                    </form>
+                </div>
+                
                 <form class="edit" action="/edit" method="post" style="display:inline;">
                     <input type="hidden" name="update_user" value="<%= user.name %>">
                     <input id="input<%= user.name %>" type="text" name="updatedItem" placeholder="Edit name" autocomplete="off" autofocus="true" hidden />

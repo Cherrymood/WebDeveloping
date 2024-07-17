@@ -200,6 +200,12 @@ app.get('/stat', async (req, res) => {
 });
 
 app.post('/add_name', async (req, res) => {
+    
+    if(!req.body.userName)
+    {
+        res.redirect('/stat');
+    }
+
     const user = req.body.userName;
 
     try {
@@ -241,6 +247,16 @@ app.post('/edit', async (req, res) => {
 
     res.redirect('/stat');
 
+});
+
+app.post('/deleteUser', async(req, res) => {
+
+    const name = req.body.deleteUser;
+    
+    await db.query("DELETE FROM leetcode_stat WHERE name = $1;",
+    [name]);
+
+    res.redirect('/stat');
 });
 //-----------------------------//
 
