@@ -408,36 +408,36 @@ app.post('/publish', (req, res) => {
     });
 });
 
-app.post('/login', (req, res) => {     
+app.post('/login', async(req, res) => {     
 
-    if(!dataExp)
-        { 
-            console.log('No users regestred');
-            res.redirect('/register');
-        }
-    else {
+   const email = req.body.email;
+   const password = req.body.password;
 
-    isAuthenticated = false;
+   try {
+    // Fetch user with the given email
+    const result = await db.query("SELECT * FROM registration WHERE email = $1", [email]);
 
-    const {email, password} = req.body;
+    if (result.rows.length > 0) {
 
-    data.users.forEach((user) => {
-        
-        if(user.email === email && user.password === password)
-        {
+        const user = result.rows[0];
+
+        if (result.rows[0].password == password) {
+
+            // Redirect to the home page
             isAuthenticated = true;
+            res.redirect("/");
+        } else {
+            // Password does not match
+            res.redirect("/error");
         }
-        });
-    }
-
-    if (isAuthenticated) {
-
-        res.redirect('/');
-
     } else {
-
-        res.status(401).render('pages/error', { message: 'Invalid email or password' });
+        // No user found with that email
+        res.redirect("/error");
     }
+} catch (error) {
+    console.error('Error during login:', error);
+    res.redirect("/error");
+}
 });
 
 app.post('/register', async(req, res) => {
