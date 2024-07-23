@@ -413,6 +413,8 @@ app.post('/login', async(req, res) => {
 
    const email = req.body.email;
    const password = req.body.password;
+   const saltRounds = 10;
+
 
    try {
     // Fetch user with the given email
@@ -422,7 +424,9 @@ app.post('/login', async(req, res) => {
 
         const user = result.rows[0];
 
-        if (result.rows[0].password == password) {
+        const match = await bcrypt.compare(password, user.password);
+
+        if (match) {
 
             // Redirect to the home page
             isAuthenticated = true;
