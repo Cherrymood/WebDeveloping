@@ -5,6 +5,9 @@ import bodyParser from "body-parser";
 import axios from "axios";
 import pg from "pg";
 import bcrypt from "bcrypt";
+import session from "express-session";
+import passport from "passport";
+import pkg from 'passport-local';
 
 const app = express();
 const port = 3000;
@@ -16,9 +19,19 @@ const db = new pg.Client({
     password: "qiwinewpass",
     port: 5432,
   });
-  db.connect();
+db.connect();
 
-
+app.use(
+    session({
+        secret: "Secret",
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24, //time while cookie is saved
+        },
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("./public"));
 app.use(express.static('./uploads'));
@@ -26,20 +39,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
-    res.locals.isAuthenticated = isAuthenticated;
+    res.locals.isAuthenticated = req.isAuthenticated();
     res.locals.posts = posts;
     next();
 });
 app.set('view engine', 'ejs');
 
 let imagename = "";
-let isAuthenticated = false;
 let yourkey = 'Zny6MhpNg3lYlhqE3Xv7AMZjuZG1i1nv';
 
 let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
-let users = data.users || [];
 let posts = data.blogs || [];
+const LocalStrategy = pkg.Strategy;
 
 
 let currentUserId = 1;
@@ -262,14 +274,13 @@ app.post('/deleteUser', async(req, res) => {
 });
 //-----------------------------//
 
-app.get('/', async(req, res) => 
-{ 
-    res.render("../views/pages/home.ejs");
+app.get('/', (req, res) => {
+    res.render('pages/home', { isAuthenticated: req.isAuthenticated()});
 });
 
 app.get('/search_post', (req, res) => {
 
-    res.render('../views/pages/search_post', { isAuthenticated });
+    res.render('pages/search_post', { isAuthenticated: req.isAuthenticated()});
 });
 
 app.get('/error', (req, res) => 
@@ -277,15 +288,18 @@ app.get('/error', (req, res) =>
     res.render('../views/pages/error');
 });
 
-app.get('/login', (req, res) => 
-{
-    res.render('../views/pages/login');
+app.get('/login', (req, res) => {
+    res.render('pages/login', { isAuthenticated: req.isAuthenticated()});
 });
 
 app.get('/logout', (req, res) => 
 {
-    isAuthenticated = false;
-    res.redirect('/'); 
+    req.logout((err) => {
+        if (err) {
+          return next(err);
+        }
+        res.redirect('/login');
+      });
 });
 
 app.get('/register', (req, res) =>
@@ -294,6 +308,7 @@ app.get('/register', (req, res) =>
 });
 
 app.get('/post/:date', (req, res) => {
+
     const newData = fs.readFileSync('./modules/data.json', 'utf8');
     const jsonData = JSON.parse(newData);
 
@@ -306,12 +321,12 @@ app.get('/post/:date', (req, res) => {
         res.status(404).send('Post not found');
         return;
     }
-    res.render('../views/pages/post', { post: post, isAuthenticated });
+    res.render('../views/pages/post', { post: post, isAuthenticated: req.isAuthenticated() });
 });
 
 app.get('/editor', (req, res) =>
 {
-    if(isAuthenticated)
+    if(req.isAuthenticated())
     {
         res.render('../views/pages/editor');
     }
@@ -409,41 +424,11 @@ app.post('/publish', (req, res) => {
     });
 });
 
-app.post('/login', async(req, res) => {     
-
-   const email = req.body.email;
-   const password = req.body.password;
-   const saltRounds = 10;
-
-
-   try {
-    // Fetch user with the given email
-    const result = await db.query("SELECT * FROM registration WHERE email = $1", [email]);
-
-    if (result.rows.length > 0) {
-
-        const user = result.rows[0];
-
-        const match = await bcrypt.compare(password, user.password);
-
-        if (match) {
-
-            // Redirect to the home page
-            isAuthenticated = true;
-            res.redirect("/");
-        } else {
-            // Password does not match
-            res.redirect("/error");
-        }
-    } else {
-        // No user found with that email
-        res.redirect("/error");
-    }
-} catch (error) {
-    console.error('Error during login:', error);
-    res.redirect("/error");
-}
-});
+app.post('/login', passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true // If using connect-flash for flash messages
+  }));
 
 app.post('/register', (req, res) => {
     const { name, email, password } = req.body;
@@ -476,7 +461,6 @@ app.post('/register', (req, res) => {
         res.redirect("/error");
     }
 });
-
 
 app.post('/search', (req, res) => {
 
@@ -538,7 +522,39 @@ app.post('/comment/:date', (req, res) => {
         return res.status(404).send('Blog post not found');
     }
 });
-    
+
+passport.use(new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+  }, async (email, password, done) => {
+    try {
+      // Fetch user with the given email
+      const result = await db.query("SELECT * FROM registration WHERE email = $1", [email]);
+      if (result.rows.length === 0) {
+        return done(null, false, { message: 'Incorrect email.' });
+      }
+  
+      const user = result.rows[0];
+      const match = await bcrypt.compare(password, user.password);
+  
+      if (match) {
+        return done(null, user);
+      } else {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+    } catch (err) {
+      return done(err);
+    }
+}));
+  
+passport.serializeUser((user, cb) => {
+    cb(null, user);
+});
+
+passport.deserializeUser((user, cb) => {
+    cb(null, user);
+})
+
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
 });
