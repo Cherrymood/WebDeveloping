@@ -4,6 +4,7 @@ import fs from 'fs';
 import bodyParser from "body-parser";
 import axios from "axios";
 import pg from "pg";
+import bcrypt from "bcrypt";
 
 const app = express();
 const port = 3000;
@@ -440,27 +441,38 @@ app.post('/login', async(req, res) => {
 }
 });
 
-app.post('/register', async(req, res) => {
+app.post('/register', (req, res) => {
+    const { name, email, password } = req.body;
+    const saltRounds = 10;
 
-    const name = req.body.name;
-    const email = req.body.email;
-    const password = req.body.password;
+    try {
+        bcrypt.hash(password, saltRounds, async (err, hash) => {
+            if (err) {
+                console.error('Error hashing password:', err);
+                return res.redirect("/error");
+            }
 
-    try{
-        await db.query( `INSERT INTO registration (name, email, password)
-        VALUES ($1, $2, $3)
-        ON CONFLICT (email) 
-        DO UPDATE SET name = EXCLUDED.name, password = EXCLUDED.password`,
-        [name, email, password]);
-    }
-    catch (error) {
-        
+            try {
+                await db.query(
+                    `INSERT INTO registration (name, email, password)
+                    VALUES ($1, $2, $3)
+                    ON CONFLICT (email) 
+                    DO UPDATE SET name = EXCLUDED.name, password = EXCLUDED.password`,
+                    [name, email, hash]
+                );
+
+                res.redirect("/login");
+            } catch (dbError) {
+                console.error('Error during registration:', dbError);
+                res.redirect("/error");
+            }
+        });
+    } catch (error) {
+        console.error('Unexpected error during registration:', error);
         res.redirect("/error");
     }
-
-    res.redirect("/login");
-
 });
+
 
 app.post('/search', (req, res) => {
 
