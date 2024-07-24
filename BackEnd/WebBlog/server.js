@@ -8,22 +8,25 @@ import bcrypt from "bcrypt";
 import session from "express-session";
 import passport from "passport";
 import pkg from 'passport-local';
+import env from "dotenv";
 
 const app = express();
 const port = 3000;
+env.config();
 const db = new pg.Client({
     user: "postgres",
     host: "localhost",
     database: "world",
     database: "permalist",
-    password: "qiwinewpass",
+    password: process.env.DB_PASSWORD,
     port: 5432,
   });
 db.connect();
 
+
 app.use(
     session({
-        secret: "Secret",
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
         cookie: {
@@ -46,7 +49,7 @@ app.use((req, res, next) => {
 app.set('view engine', 'ejs');
 
 let imagename = "";
-let yourkey = 'Zny6MhpNg3lYlhqE3Xv7AMZjuZG1i1nv';
+let yourkey = process.env.NEW_YOURK_TIMES_KEY;
 
 let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
