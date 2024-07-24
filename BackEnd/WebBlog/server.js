@@ -53,97 +53,6 @@ let data = JSON.parse(dataExp);
 let posts = data.blogs || [];
 const LocalStrategy = pkg.Strategy;
 
-
-let currentUserId = 1;
-let usersTravel = [];
-
-async function checkVisisted() {
-
-    const result = await db.query(
-      "SELECT country_code FROM visited_countries JOIN users ON users.id = user_id WHERE user_id = $1; ",
-      [currentUserId]
-    );
-    let countries = [];
-    result.rows.forEach((country) => {
-      countries.push(country.country_code);
-    });
-    return countries;
-  }
-
-async function checkUser() {
-    const result = await db.query("SELECT * FROM users");
-    usersTravel = result.rows;
-    return usersTravel.find((user) => user.id == currentUserId);
-  }
-
-//------------Travel tracker -----//
-
-app.get('/travel_tracker', async(req, res) => 
-  { 
-      const currentUser = await checkUser();
-      const countries = await checkVisisted();
-      res.render("../views/pages/travel_tracker.ejs", {
-        countries: countries,
-        total: countries.length,
-        users: usersTravel,
-        color: currentUser.color,
-      });
-  });
-  app.post("/add", async (req, res) => {
-    const input = req.body["country"];
-  
-    try {
-      const result = await db.query(
-        "SELECT country_code FROM countries WHERE LOWER(country_name) LIKE '%' || $1 || '%';",
-        [input.toLowerCase()]
-      );
-  
-      const data = result.rows[0];
-      const countryCode = data.country_code;
-      try {
-        await db.query(
-          "INSERT INTO visited_countries (country_code) VALUES ($1)",
-          [countryCode]
-        );
-        res.redirect("/");
-      } catch (err) {
-        console.log(err);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
-
-app.post("/user", async (req, res) => {
-
-    if(req.body.add === "new")
-    {
-      res.render("../views/pages/new.ejs");
-    }
-    else{
-      res.redirect("/travel_tracker");
-    }
-  });
-  
-app.post("/new", async (req, res) => {
-  
-    let color = req.body.color;
-  
-    let name = req.body.name;
-    
-    const result = await db.query(
-      "INSERT INTO users (name, color) VALUES($1, $2) RETURNING *;",
-      [name, color]
-    );
-    const id = result.rows[0].id;
-    console.log(result.rows[0].id);
-  
-    currentUserId = id;
-  
-    res.redirect("/travel_tracker");
-  
-  });
-
 //--------API--------------//
 
 //api archive nytimes
@@ -431,6 +340,7 @@ app.post('/login', passport.authenticate('local', {
   }));
 
 app.post('/register', (req, res) => {
+
     const { name, email, password } = req.body;
     const saltRounds = 10;
 
@@ -442,15 +352,24 @@ app.post('/register', (req, res) => {
             }
 
             try {
-                await db.query(
+                const result = await db.query(
                     `INSERT INTO registration (name, email, password)
                     VALUES ($1, $2, $3)
                     ON CONFLICT (email) 
-                    DO UPDATE SET name = EXCLUDED.name, password = EXCLUDED.password`,
+                    DO UPDATE SET name = EXCLUDED.name, password = EXCLUDED.password 
+                    RETURNING *`,
                     [name, email, hash]
                 );
 
+                const user = result.rows[0];
+                
+                req.logIn(user, (err) => {
+                    console.log(err);
+                    res.redirect("/");
+                })
+
                 res.redirect("/login");
+
             } catch (dbError) {
                 console.error('Error during registration:', dbError);
                 res.redirect("/error");
