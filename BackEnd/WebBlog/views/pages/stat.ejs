@@ -1,78 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible"
+        content="IE=edge">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
     <title>LeetCode</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles/login.css">
-    <link rel="stylesheet" href="./styles/navbar.css">
-    <link rel="stylesheet" href="./styles/stat.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="./styles/login.css">
+    <link rel="stylesheet"
+        href="./styles/navbar.css">
+    <link rel="stylesheet"
+        href="./styles/stat.css">
 
 </head>
+
 <body>
     <%- include('../partials/header')%>
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <% if (users.length > 0) { %>
-            <% users.forEach(user => { %>
-                
-              <th>
-                <%= user.name %>
-                
-                <form class="edit" action="/edit" method="post">
-                    <input type="hidden" name="update_user" value="<%= user.name %>">
-                    <input id="input<%= user.name %>" type="text" name="updatedItem" placeholder="Edit name" autocomplete="off" autofocus="true" hidden />
-                    <button id="done<%= user.name %>" class="edit" type="submit" hidden><img class="icon" src="/img/edit.png" alt="tick image"></button>
-                </form>
+    <table>
+        <thead>
+            <tr>
+                <th></th>
+                <% if (users.length > 0) { %>
+                <% users.forEach(user => { %>
 
-                <button id="edit<%= user.name %>" class="edit" onclick="handler('<%= user.name %>')"><img class="icon" src="/img/edit.png" alt="pencil image"></button>
-            
-                <div class="delete">
-                <form action="/deleteUser" method="post">
-                    <input type="checkbox" id="delete<%= user.name %>" onchange="this.form.submit()" name="deleteUser" value="<%= user.name %>">
-                    <label for="delete<%= user.name %>">
-                    <img src="/img/delete.png" alt="delete icon" class="checkbox-image">
-                    </label>
-                </form>
-            </div>
-            </th>
-            <% }) %>
+                <th>
+                    <%= user.name %>
 
-            <th class="add-item">
-                <form class="add-item" action="/add_name" method="post">
-                    <div class="input-group" id="inputGroupNewUser" style="display: none;">
-                        <input type="text" id="newUserName" name="userName" placeholder="New Name" autocomplete="off" autofocus />
-                        <button class="add" type="submit" name="list" value="text">+</button>
+                    <form class="edit"
+                        action="/edit"
+                        method="post">
+                        <input
+                            type="hidden"
+                            name="update_user"
+                            value="<%= user.name %>">
+                        <input
+                            id="input<%= user.name %>"
+                            type="text"
+                            name="updatedItem"
+                            placeholder="Edit name"
+                            autocomplete="off"
+                            autofocus="true"
+                            hidden />
+                        <button
+                            id="done<%= user.name %>"
+                            class="edit"
+                            type="submit"
+                            hidden><img
+                                class="icon"
+                                src="/img/edit.png"
+                                alt="tick image"></button>
+                    </form>
+
+                    <button
+                        id="edit<%= user.name %>"
+                        class="edit"
+                        onclick="handler('<%= user.name %>')"><img
+                            class="icon"
+                            src="/img/edit.png"
+                            alt="pencil image"></button>
+
+                    <div class="delete">
+                        <form
+                            action="/deleteUser"
+                            method="post">
+                            <input
+                                type="checkbox"
+                                id="delete<%= user.name %>"
+                                onchange="this.form.submit()"
+                                name="deleteUser"
+                                value="<%= user.name %>">
+                            <label
+                                for="delete<%= user.name %>">
+                                <img src="/img/delete.png"
+                                    alt="delete icon"
+                                    class="checkbox-image">
+                            </label>
+                        </form>
                     </div>
-                    <button id="addNewUserBtn" class="add" type="button" onclick="toggleAddNewUser()">+</button>
-                </form>
-            </th>
+                </th>
+                <% }) %>
 
-        <% } else { %>
-            <th>No users found</th>
-            <th class="add-item">
-                <form class="add-item" action="/add_name" method="post">
-                    <div class="input-group" id="inputGroupNewUser" style="display: none;">
-                        <input type="text" id="newUserName" name="userName" placeholder="New Name" autocomplete="off" autofocus />
-                        <button class="add" type="submit" name="list" value="text">+</button>
-                    </div>
-                    <button id="addNewUserBtn" class="add" type="button" onclick="toggleAddNewUser()">+</button>
-                </form>
-            </th>
-        <% } %>
-      </tr>
-    </thead>
-    <tbody>
-        <% if (users.length > 0) { %>
+                <th class="add-item">
+                    <form
+                        class="add-item"
+                        action="/add_name"
+                        method="post">
+                        <div class="input-group"
+                            id="inputGroupNewUser"
+                            style="display: none;">
+                            <input
+                                type="text"
+                                id="newUserName"
+                                name="userName"
+                                placeholder="New Name"
+                                autocomplete="off"
+                                autofocus />
+                            <button
+                                class="add"
+                                type="submit"
+                                name="list"
+                                value="text">+</button>
+                        </div>
+                        <button
+                            id="addNewUserBtn"
+                            class="add"
+                            type="button"
+                            onclick="toggleAddNewUser()">+</button>
+                    </form>
+                </th>
+
+                <% } else { %>
+                <th>No users found</th>
+                <th class="add-item">
+                    <form
+                        class="add-item"
+                        action="/add_name"
+                        method="post">
+                        <div class="input-group"
+                            id="inputGroupNewUser"
+                            style="display: none;">
+                            <input
+                                type="text"
+                                id="newUserName"
+                                name="userName"
+                                placeholder="New Name"
+                                autocomplete="off"
+                                autofocus />
+                            <button
+                                class="add"
+                                type="submit"
+                                name="list"
+                                value="text">+</button>
+                        </div>
+                        <button
+                            id="addNewUserBtn"
+                            class="add"
+                            type="button"
+                            onclick="toggleAddNewUser()">+</button>
+                    </form>
+                </th>
+                <% } %>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (users.length > 0) { %>
             <tr>
                 <th>Total Solved</th>
                 <% users.forEach(user => { %>
-                    <td class="right-align"><%= user.total_solved %></td>
+                <td class="right-align">
+                    <%= user.total_solved %>
+                </td>
                 <% }) %>
                 <td></td>
             </tr>
@@ -80,7 +164,9 @@
             <tr>
                 <th>Total Medium</th>
                 <% users.forEach(user => { %>
-                    <td class="right-align"><%= user.total_medium %></td>
+                <td class="right-align">
+                    <%= user.total_medium %>
+                </td>
                 <% }) %>
                 <td></td>
             </tr>
@@ -88,7 +174,9 @@
             <tr>
                 <th>Total Hard</th>
                 <% users.forEach(user => { %>
-                    <td class="right-align"><%= user.total_hard %></td>
+                <td class="right-align">
+                    <%= user.total_hard %>
+                </td>
                 <% }) %>
                 <td></td>
             </tr>
@@ -96,7 +184,9 @@
             <tr>
                 <th>Acceptance Rate</th>
                 <% users.forEach(user => { %>
-                    <td class="right-align"><%= user.acceptance_rate %></td>
+                <td class="right-align">
+                    <%= user.acceptance_rate %>
+                </td>
                 <% }) %>
                 <td></td>
             </tr>
@@ -104,29 +194,41 @@
             <tr>
                 <th>Rank</th>
                 <% users.forEach(user => { %>
-                    <td class="right-align"><%= user.ranking %></td>
+                <td class="right-align">
+                    <%= user.ranking %>
+                </td>
                 <% }) %>
                 <td></td>
             </tr>
-        <% } %>
-    </tbody>
-</table>
+            <% } %>
+        </tbody>
+    </table>
 
 </body>
 <script>
-  function handler(itemId) {
-      document.getElementById('input' + itemId).hidden = false;
-      document.getElementById('done' + itemId).hidden = false;
-      document.getElementById('edit' + itemId).hidden = true;
-  }
-  
-  function toggleAddNewUser() {
-      const inputGroup = document.getElementById('inputGroupNewUser');
-      const addNewUserBtn = document.getElementById('addNewUserBtn');
-      inputGroup.style.display = inputGroup.style.display === 'none' ? 'flex' : 'none';
-      addNewUserBtn.style.display = addNewUserBtn.style.display === 'none' ? 'block' : 'none';
-  }
-  </script>
-  
-  
+function handler(itemId) {
+    document.getElementById('input' +
+        itemId).hidden = false;
+    document.getElementById('done' +
+        itemId).hidden = false;
+    document.getElementById('edit' +
+        itemId).hidden = true;
+}
+
+function toggleAddNewUser() {
+    const inputGroup = document
+        .getElementById(
+            'inputGroupNewUser');
+    const addNewUserBtn = document
+        .getElementById(
+        'addNewUserBtn');
+    inputGroup.style.display =
+        inputGroup.style.display ===
+        'none' ? 'flex' : 'none';
+    addNewUserBtn.style.display =
+        addNewUserBtn.style.display ===
+        'none' ? 'block' : 'none';
+}
+</script>
+
 </html>
