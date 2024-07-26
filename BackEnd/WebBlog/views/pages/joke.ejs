@@ -1,41 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible"
+        content="IE=edge">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
     <title>Blog : Joke</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles/home.css">
-    <link rel="stylesheet" href="/styles/navbar.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet"
+        href="styles/home.css">
+    <link rel="stylesheet"
+        href="/styles/navbar.css">
 
 </head>
+
 <body>
     <%- include('../partials/header')%>
-    
+
     <header class="header">
         <div class="content">
             <h1>Here is your joke:</h1>
 
-        <div class="setup">
-            <p>
-              <%= setup %>
+            <div class="setup">
+                <p>
+                    <%= setup %>
+                </p>
+            </div>
+            <p class="delivery">
+                <%= delivery %>
             </p>
-        </div>
-          <p class="delivery">
-            <%= delivery %>
-          </p>
-   
-        <p>
-          <a href="/nytimes_titles" class="btn">Get articles</a>
-        </p>
+
+            <p>
+                <a href="/nytimes_titles"
+                    class="btn">Get
+                    articles</a>
+            </p>
         </div>
     </header>
 
     <%- include('../partials/footer')%>
 
-<script src="js/home.js"></script>
+    <script src="js/home.js"></script>
 
 </body>
+
 </html>

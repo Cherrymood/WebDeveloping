@@ -9,19 +9,11 @@ import session from "express-session";
 import passport from "passport";
 import pkg from 'passport-local';
 import env from "dotenv";
+import GoogleStrategy from "passport-google-oauth2";
 
 const app = express();
 const port = 3000;
 env.config();
-const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "world",
-    database: "permalist",
-    password: process.env.DB_PASSWORD,
-    port: 5432,
-  });
-db.connect();
 
 
 app.use(
@@ -33,6 +25,14 @@ app.use(
             maxAge: 1000 * 60 * 60 * 24, //time while cookie is saved
         },
 }));
+const db = new pg.Client({
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE_2,
+    password: process.env.PG_DB_PASSWORD,
+    port: 5432,
+  });
+db.connect();
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({extended: true}));
@@ -201,6 +201,7 @@ app.get('/error', (req, res) =>
 });
 
 app.get('/login', (req, res) => {
+
     res.render('pages/login', { isAuthenticated: req.isAuthenticated()});
 });
 
@@ -336,8 +337,24 @@ app.post('/publish', (req, res) => {
     });
 });
 
-app.post('/login', passport.authenticate('local', {
-    successRedirect: '/',
+app.get("/auth/google",
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+    })
+);
+
+app.get("/auth/google/editor",
+    passport.authenticate("google", {
+    successRedirect: '/editor',
+    failureRedirect: '/login',
+    failureFlash: true // If using connect-flash for flash messages
+    })
+)
+
+app.post('/login', 
+
+    passport.authenticate('local', {
+    successRedirect: '/editor',
     failureRedirect: '/login',
     failureFlash: true // If using connect-flash for flash messages
   }));
@@ -445,7 +462,35 @@ app.post('/comment/:date', (req, res) => {
     }
 });
 
-passport.use(new LocalStrategy({
+passport.use("google", new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/google/editor",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+}, async (accessToken, refreshToken, profile, cb) => {
+    console.log(profile);
+    try {
+        const email = profile.email;
+        const name = profile.displayName;
+
+        const result = await db.query("SELECT * FROM registration WHERE email=$1", [email]);
+
+        if (result.rows.length === 0) {
+            const newUser = await db.query("INSERT INTO registration (name, email, password) VALUES ($1, $2, $3)", 
+            [name, email, "google"]);
+            
+            cb(null, newUser.rows[0]);
+
+        } else {
+            cb(null, result.rows[0]);
+        }
+    } catch (err) {
+        cb(err);
+    }
+}));
+
+passport.use("local",
+    new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password'
   }, async (email, password, done) => {
