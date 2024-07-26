@@ -468,7 +468,7 @@ passport.use("google", new GoogleStrategy({
     callbackURL: "http://localhost:3000/auth/google/editor",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
 }, async (accessToken, refreshToken, profile, cb) => {
-    console.log(profile);
+  
     try {
         const email = profile.email;
         const name = profile.displayName;
