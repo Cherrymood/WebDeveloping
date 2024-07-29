@@ -152,7 +152,6 @@ dist
  *.pyc
  *.xml
  ipch/
- obj/
  [Bb]in
  [Dd]ebug*/
  [Rr]elease*/
@@ -164,4 +163,5 @@ dist
  .svn
  ~$*
  *.sln
+obj/
  *.csproj
