@@ -4,20 +4,37 @@ import fs from 'fs';
 import bodyParser from "body-parser";
 import axios from "axios";
 import pg from "pg";
+import bcrypt from "bcrypt";
+import session from "express-session";
+import passport from "passport";
+import pkg from 'passport-local';
+import env from "dotenv";
+import GoogleStrategy from "passport-google-oauth2";
 
 const app = express();
 const port = 3000;
+env.config();
+
+
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24, //time while cookie is saved
+        },
+}));
 const db = new pg.Client({
-    user: "postgres",
-    host: "localhost",
-    database: "world",
-    database: "permalist",
-    password: "qiwinewpass",
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE_2,
+    password: process.env.PG_DB_PASSWORD,
     port: 5432,
   });
-  db.connect();
-
-
+db.connect();
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("./public"));
 app.use(express.static('./uploads'));
@@ -25,111 +42,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileupload());
 app.use((req, res, next) => {
-    res.locals.isAuthenticated = isAuthenticated;
+    res.locals.isAuthenticated = req.isAuthenticated();
     res.locals.posts = posts;
     next();
 });
 app.set('view engine', 'ejs');
 
 let imagename = "";
-let isAuthenticated = false;
-let yourkey = 'Zny6MhpNg3lYlhqE3Xv7AMZjuZG1i1nv';
+let yourkey = process.env.NEW_YOURK_TIMES_KEY;
 
 let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 let data = JSON.parse(dataExp);
-let users = data.users || [];
 let posts = data.blogs || [];
-
-
-let currentUserId = 1;
-let usersTravel = [];
-
-async function checkVisisted() {
-
-    const result = await db.query(
-      "SELECT country_code FROM visited_countries JOIN users ON users.id = user_id WHERE user_id = $1; ",
-      [currentUserId]
-    );
-    let countries = [];
-    result.rows.forEach((country) => {
-      countries.push(country.country_code);
-    });
-    return countries;
-  }
-
-async function checkUser() {
-    const result = await db.query("SELECT * FROM users");
-    usersTravel = result.rows;
-    return usersTravel.find((user) => user.id == currentUserId);
-  }
-
-//------------Travel tracker -----//
-
-app.get('/travel_tracker', async(req, res) => 
-  { 
-      const currentUser = await checkUser();
-      const countries = await checkVisisted();
-      res.render("../views/pages/travel_tracker.ejs", {
-        countries: countries,
-        total: countries.length,
-        users: usersTravel,
-        color: currentUser.color,
-      });
-  });
-  app.post("/add", async (req, res) => {
-    const input = req.body["country"];
-  
-    try {
-      const result = await db.query(
-        "SELECT country_code FROM countries WHERE LOWER(country_name) LIKE '%' || $1 || '%';",
-        [input.toLowerCase()]
-      );
-  
-      const data = result.rows[0];
-      const countryCode = data.country_code;
-      try {
-        await db.query(
-          "INSERT INTO visited_countries (country_code) VALUES ($1)",
-          [countryCode]
-        );
-        res.redirect("/");
-      } catch (err) {
-        console.log(err);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
-
-app.post("/user", async (req, res) => {
-
-    if(req.body.add === "new")
-    {
-      res.render("../views/pages/new.ejs");
-    }
-    else{
-      res.redirect("/travel_tracker");
-    }
-  });
-  
-app.post("/new", async (req, res) => {
-  
-    let color = req.body.color;
-  
-    let name = req.body.name;
-    
-    const result = await db.query(
-      "INSERT INTO users (name, color) VALUES($1, $2) RETURNING *;",
-      [name, color]
-    );
-    const id = result.rows[0].id;
-    console.log(result.rows[0].id);
-  
-    currentUserId = id;
-  
-    res.redirect("/travel_tracker");
-  
-  });
+const LocalStrategy = pkg.Strategy;
 
 //--------API--------------//
 
@@ -189,10 +114,10 @@ app.get('/stat', async (req, res) => {
         );
 
         if (!result.rows || result.rows.length === 0) {
-            return res.render('../views/pages/leetcode/stat', { users: {}});
+            return res.render('../views/pages/stat', { users: {}});
         }
 
-        res.render('../views/pages/leetcode/stat', { users: result.rows });
+        res.render('../views/pages/stat', { users: result.rows });
 
     } catch (error) {
         console.error('Error fetching LeetCode statistics:', error);
@@ -261,14 +186,13 @@ app.post('/deleteUser', async(req, res) => {
 });
 //-----------------------------//
 
-app.get('/', async(req, res) => 
-{ 
-    res.render("../views/pages/home.ejs");
+app.get('/', (req, res) => {
+    res.render('pages/home', { isAuthenticated: req.isAuthenticated()});
 });
 
 app.get('/search_post', (req, res) => {
 
-    res.render('../views/pages/search_post', { isAuthenticated });
+    res.render('pages/search_post', { isAuthenticated: req.isAuthenticated()});
 });
 
 app.get('/error', (req, res) => 
@@ -276,15 +200,19 @@ app.get('/error', (req, res) =>
     res.render('../views/pages/error');
 });
 
-app.get('/login', (req, res) => 
-{
-    res.render('../views/pages/login');
+app.get('/login', (req, res) => {
+
+    res.render('pages/login', { isAuthenticated: req.isAuthenticated()});
 });
 
 app.get('/logout', (req, res) => 
 {
-    isAuthenticated = false;
-    res.redirect('/'); 
+    req.logout((err) => {
+        if (err) {
+          return next(err);
+        }
+        res.redirect('/login');
+      });
 });
 
 app.get('/register', (req, res) =>
@@ -293,6 +221,7 @@ app.get('/register', (req, res) =>
 });
 
 app.get('/post/:date', (req, res) => {
+
     const newData = fs.readFileSync('./modules/data.json', 'utf8');
     const jsonData = JSON.parse(newData);
 
@@ -305,12 +234,12 @@ app.get('/post/:date', (req, res) => {
         res.status(404).send('Post not found');
         return;
     }
-    res.render('../views/pages/post', { post: post, isAuthenticated });
+    res.render('../views/pages/post', { post: post, isAuthenticated: req.isAuthenticated() });
 });
 
 app.get('/editor', (req, res) =>
 {
-    if(isAuthenticated)
+    if(req.isAuthenticated())
     {
         res.render('../views/pages/editor');
     }
@@ -408,135 +337,68 @@ app.post('/publish', (req, res) => {
     });
 });
 
-app.post('/login', (req, res) => {     
+app.get("/auth/google",
+    passport.authenticate("google", {
+        scope: ["profile", "email"],
+    })
+);
 
-    if(!dataExp)
-        { 
-            console.log('No users regestred');
-            res.redirect('/register');
-        }
-    else {
+app.get("/auth/google/editor",
+    passport.authenticate("google", {
+    successRedirect: '/editor',
+    failureRedirect: '/login',
+    failureFlash: true // If using connect-flash for flash messages
+    })
+)
 
-    isAuthenticated = false;
+app.post('/login', 
 
-    const {email, password} = req.body;
-
-    data.users.forEach((user) => {
-        
-        if(user.email === email && user.password === password)
-        {
-            isAuthenticated = true;
-        }
-        });
-    }
-
-    if (isAuthenticated) {
-
-        res.redirect('/');
-
-    } else {
-
-        res.status(401).render('pages/error', { message: 'Invalid email or password' });
-    }
-});
+    passport.authenticate('local', {
+    successRedirect: '/editor',
+    failureRedirect: '/login',
+    failureFlash: true // If using connect-flash for flash messages
+  }));
 
 app.post('/register', (req, res) => {
-    //read the data from json file
-    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 
-    if(!dataExp)
-    {
-        console.log('no data availiable');
-        let data = {};
-        data.users = [];
+    const { name, email, password } = req.body;
+    const saltRounds = 10;
 
-        let newUser = {
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            id: 1
-          };
-
-        data.users.push(newUser);
-
-        let dataToFile = JSON.stringify(data);
-
-        fs.writeFile('./modules/data.json', dataToFile, function(err) {
+    try {
+        bcrypt.hash(password, saltRounds, async (err, hash) => {
             if (err) {
-                res.redirect('../views/pages/error');
-              }});
-
-    } else {
-      // As we have seen we store a JSON string in the data file. So when we read the file and store the data into the variable dataExp we have JSON string data in that variable.
-      //  To process these data in our JavaScript code we must parse this JSON so that a JavaScript object is created from the JSON string.
-      //  This is what we do with the JSON.parse() function.
-      
-      let data = JSON.parse(dataExp);
-
-      if(!data.users) {
-        console.log('no users are available')
-        data.users = []
-
-        let newUser = {
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            id: 1
-          };
-
-      data.users.push(newUser);
-
-      // With JSON.stringify() we take the JavaScript data object, create a JSON string out of it and store this string into the dataToFile variable.
-      //  With fs.writeFile we write the json string into the so far empty data.json file.
-      // note: If you use JavaScript to develop applications, JavaScript objects have to be converted into strings if the data is to be stored in a database or a data file.
-      //  The same applies if you want to send data to an API or to a webserver. 
-      // The JSON.stringify() function does this for us.
-
-      let dataToFile = JSON.stringify(data);
-
-        fs.writeFile('./modules/data.json', dataToFile, function(err) {
-
-            if (err) {
-
-                res.redirect('../views/pages/error');
-                
-              }});
-
-      } else {
-        console.log('users are available');
-
-        var newID = data.users[data.users.length -1].id + 1;
-
-        users.forEach((user) => {
-
-            if(user.email == req.body.email || req.body.password.length < 6)
-            {
-                res.redirect('../views/pages/error');
+                console.error('Error hashing password:', err);
+                return res.redirect("/error");
             }
-            else{
 
-            let newUser = {
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password,
-                id: newID
-              };
+            try {
+                const result = await db.query(
+                    `INSERT INTO registration (name, email, password)
+                    VALUES ($1, $2, $3)
+                    ON CONFLICT (email) 
+                    DO UPDATE SET name = EXCLUDED.name, password = EXCLUDED.password 
+                    RETURNING *`,
+                    [name, email, hash]
+                );
 
-              data.users.push(newUser);}
+                const user = result.rows[0];
+                
+                req.logIn(user, (err) => {
+                    console.log(err);
+                    res.redirect("/");
+                })
+
+                res.redirect("/login");
+
+            } catch (dbError) {
+                console.error('Error during registration:', dbError);
+                res.redirect("/error");
+            }
         });
-
-      let dataToFile = JSON.stringify(data);
-
-      fs.writeFile('./modules/data.json', dataToFile, function(err) {
-        if (err) {
-            res.redirect('../views/pages/error');
-          }});
-      };
-  };
-
-isAuthenticated = true;
-
-res.redirect('/'); 
+    } catch (error) {
+        console.error('Unexpected error during registration:', error);
+        res.redirect("/error");
+    }
 });
 
 app.post('/search', (req, res) => {
@@ -599,7 +461,67 @@ app.post('/comment/:date', (req, res) => {
         return res.status(404).send('Blog post not found');
     }
 });
-    
+
+passport.use("google", new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/google/editor",
+    userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
+}, async (accessToken, refreshToken, profile, cb) => {
+  
+    try {
+        const email = profile.email;
+        const name = profile.displayName;
+
+        const result = await db.query("SELECT * FROM registration WHERE email=$1", [email]);
+
+        if (result.rows.length === 0) {
+            const newUser = await db.query("INSERT INTO registration (name, email, password) VALUES ($1, $2, $3)", 
+            [name, email, "google"]);
+            
+            cb(null, newUser.rows[0]);
+
+        } else {
+            cb(null, result.rows[0]);
+        }
+    } catch (err) {
+        cb(err);
+    }
+}));
+
+passport.use("local",
+    new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password'
+  }, async (email, password, done) => {
+    try {
+      // Fetch user with the given email
+      const result = await db.query("SELECT * FROM registration WHERE email = $1", [email]);
+      if (result.rows.length === 0) {
+        return done(null, false, { message: 'Incorrect email.' });
+      }
+  
+      const user = result.rows[0];
+      const match = await bcrypt.compare(password, user.password);
+  
+      if (match) {
+        return done(null, user);
+      } else {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+    } catch (err) {
+      return done(err);
+    }
+}));
+  
+passport.serializeUser((user, cb) => {
+    cb(null, user);
+});
+
+passport.deserializeUser((user, cb) => {
+    cb(null, user);
+})
+
 app.listen(port, () =>{
     console.log(`Server is running on port ${port}`);
 });

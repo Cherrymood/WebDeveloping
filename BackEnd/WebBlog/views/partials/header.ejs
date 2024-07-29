@@ -1,29 +1,48 @@
 <nav class="navbar">
   <ul class="links-container">
-      <li class="link"><a href="/">Home</a></li>
+      <li class="link"><a
+              href="/">Home</a></li>
       <li class="link dropdown">
-        <a href="#" class="dropbtn">Public APIs <i class="fa fa-caret-down"></i></a>
-        <div class="dropdown-content">
-          <a href="/joke">Random Joke</a>
-          <a href="/weather">Weather</a>
-          <a href="/nytimes">New York Times</a>
-          <a href="/travel_tracker">Travel Tracker</a>
-          <a href="/stat">LeetCode tracker</a>
-        </div>
+          <a href="#"
+              class="dropbtn">Public
+              APIs <i
+                  class="fa fa-caret-down"></i></a>
+          <div
+              class="dropdown-content">
+              <a href="/joke">Random
+                  Joke</a>
+              <a
+                  href="/weather">Weather</a>
+              <a href="/nytimes">New
+                  York Times</a>
+              <a href="/stat">LeetCode
+                  tracker</a>
+          </div>
       </li>
       <% if (isAuthenticated) { %>
-          <li class="link"><a href="/editor">Make Post</a></li>
-          <li class="link"><a href="/logout">Logout</a></li>
+      <li class="link"><a
+              href="/editor">Make
+              Post</a></li>
+      <li class="link"><a
+              href="/logout">Logout</a>
+      </li>
       <% } else { %>
-          <li class="link"><a href="/login">Login</a></li>
+      <li class="link"><a
+              href="/login">Login</a>
+      </li>
       <% } %>
   </ul>
 
   <div class="wrap">
-      <form action="/search" method="post">
+      <form action="/search"
+          method="post">
           <div class="search">
-              <input class="searchTerm" name="search" placeholder="Search...">
-              <button type="submit" class="searchButton">Ok</button>
+              <input
+                  class="searchTerm"
+                  name="search"
+                  placeholder="Search...">
+              <button type="submit"
+                  class="searchButton">Ok</button>
           </div>
       </form>
   </div>
