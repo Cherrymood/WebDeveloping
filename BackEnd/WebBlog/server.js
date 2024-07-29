@@ -360,102 +360,45 @@ app.post('/login',
   }));
 
 app.post('/register', (req, res) => {
-    //read the data from json file
-    let dataExp = fs.readFileSync('./modules/data.json', 'utf8');
 
-    if(!dataExp)
-    {
-        console.log('no data availiable');
-        let data = {};
-        data.users = [];
+    const { name, email, password } = req.body;
+    const saltRounds = 10;
 
-        let newUser = {
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            id: 1
-          };
-
-        data.users.push(newUser);
-
-        let dataToFile = JSON.stringify(data);
-
-        fs.writeFile('./modules/data.json', dataToFile, function(err) {
+    try {
+        bcrypt.hash(password, saltRounds, async (err, hash) => {
             if (err) {
-                res.redirect('../views/pages/error');
-              }});
-
-    } else {
-      // As we have seen we store a JSON string in the data file. So when we read the file and store the data into the variable dataExp we have JSON string data in that variable.
-      //  To process these data in our JavaScript code we must parse this JSON so that a JavaScript object is created from the JSON string.
-      //  This is what we do with the JSON.parse() function.
-      
-      let data = JSON.parse(dataExp);
-
-      if(!data.users) {
-        console.log('no users are available')
-        data.users = []
-
-        let newUser = {
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password,
-            id: 1
-          };
-
-      data.users.push(newUser);
-
-      // With JSON.stringify() we take the JavaScript data object, create a JSON string out of it and store this string into the dataToFile variable.
-      //  With fs.writeFile we write the json string into the so far empty data.json file.
-      // note: If you use JavaScript to develop applications, JavaScript objects have to be converted into strings if the data is to be stored in a database or a data file.
-      //  The same applies if you want to send data to an API or to a webserver. 
-      // The JSON.stringify() function does this for us.
-
-      let dataToFile = JSON.stringify(data);
-
-        fs.writeFile('./modules/data.json', dataToFile, function(err) {
-
-            if (err) {
-
-                res.redirect('../views/pages/error');
-                
-              }});
-
-      } else {
-        console.log('users are available');
-
-        var newID = data.users[data.users.length -1].id + 1;
-
-        users.forEach((user) => {
-
-            if(user.email == req.body.email || req.body.password.length < 6)
-            {
-                res.redirect('../views/pages/error');
+                console.error('Error hashing password:', err);
+                return res.redirect("/error");
             }
-            else{
 
-            let newUser = {
-                name: req.body.name,
-                email: req.body.email,
-                password: req.body.password,
-                id: newID
-              };
+            try {
+                const result = await db.query(
+                    `INSERT INTO registration (name, email, password)
+                    VALUES ($1, $2, $3)
+                    ON CONFLICT (email) 
+                    DO UPDATE SET name = EXCLUDED.name, password = EXCLUDED.password 
+                    RETURNING *`,
+                    [name, email, hash]
+                );
 
-              data.users.push(newUser);}
+                const user = result.rows[0];
+                
+                req.logIn(user, (err) => {
+                    console.log(err);
+                    res.redirect("/");
+                })
+
+                res.redirect("/login");
+
+            } catch (dbError) {
+                console.error('Error during registration:', dbError);
+                res.redirect("/error");
+            }
         });
-
-      let dataToFile = JSON.stringify(data);
-
-      fs.writeFile('./modules/data.json', dataToFile, function(err) {
-        if (err) {
-            res.redirect('../views/pages/error');
-          }});
-      };
-  };
-
-isAuthenticated = true;
-
-res.redirect('/'); 
+    } catch (error) {
+        console.error('Unexpected error during registration:', error);
+        res.redirect("/error");
+    }
 });
 
 app.post('/search', (req, res) => {
