@@ -25,6 +25,7 @@ app.use(
             maxAge: 1000 * 60 * 60 * 24, //time while cookie is saved
         },
 }));
+
 const db = new pg.Client({
     user: process.env.PG_USER,
     host: process.env.PG_HOST,
@@ -32,6 +33,7 @@ const db = new pg.Client({
     password: process.env.PG_DB_PASSWORD,
     port: 5432,
   });
+  
 db.connect();
 app.use(passport.initialize());
 app.use(passport.session());
