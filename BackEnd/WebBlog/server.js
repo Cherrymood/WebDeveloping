@@ -12,7 +12,7 @@ import env from "dotenv";
 import GoogleStrategy from "passport-google-oauth2";
 
 const app = express();
-const port = 3000;
+const port = 11011;
 env.config();
 
 
@@ -267,6 +267,7 @@ app.post('/get-articles', async (req, res) => {
         res.status(500).send('An error occurred while fetching articles.');
     }
 });
+
 //upload img 
 app.post('/upload', (req, res) => {
     let file = req.files.image;

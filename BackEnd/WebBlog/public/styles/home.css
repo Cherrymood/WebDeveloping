@@ -206,6 +206,15 @@ p {
   color: #555;
 }
 
+.error {
+  background: url(/img/error.jpg);
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
 @media only screen and (min-width: 768px) {
   .article-ul li a {
       flex-direction: row;
@@ -215,12 +224,4 @@ p {
   .article-list__date {
       text-align: right;
   }
-}
-
-.error {
-  background: url(/img/error.jpg);
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }

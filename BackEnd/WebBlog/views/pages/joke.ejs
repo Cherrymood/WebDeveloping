@@ -15,7 +15,9 @@
     <link rel="stylesheet"
         href="styles/home.css">
     <link rel="stylesheet"
-        href="/styles/navbar.css">
+        href="styles/navbar.css">
+    <link rel="stylesheet"
+        href="styles/joke.css">
 
 </head>
 
@@ -30,10 +32,17 @@
                 <p>
                     <%= setup %>
                 </p>
+
             </div>
+
             <p class="delivery">
+
                 <%= delivery %>
             </p>
+
+            <button class="btn" type="button" onclick="location.reload()">
+                Get New Joke
+            </button>
             
         </div>
     </header>
@@ -41,6 +50,7 @@
     <%- include('../partials/footer')%>
 
     <script src="js/home.js"></script>
+    <script src="../../public/js/joke.js"></script>
 
 </body>
 
