@@ -155,4 +155,32 @@ body {
         width: 100%;
         text-align: center;
     }
+    .search {
+        display: flex;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        overflow: hidden;
+        background-color: #fff;
+    }
+    
+    .searchTerm {
+        padding: 5px;
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        color: #333;
+        background-color: #fff;
+    }
+    
+    .searchButton {
+        padding: 5px 5px;
+        border: none;
+        background-color: #ddd;
+        color: #333;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .link a {
+        font-size: 15px;
+    }
 }
