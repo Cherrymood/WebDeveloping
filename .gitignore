@@ -165,3 +165,4 @@ dist
  *.sln
 obj/
   *.csproj
+  *.json
