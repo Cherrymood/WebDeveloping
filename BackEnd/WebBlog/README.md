@@ -12,8 +12,12 @@ Node.js and Express: The backend is powered by Node.js and Express, ensuring fas
 
 Technologies Used
 
-Frontend: HTML, CSS, JavaScript
-Backend: Node.js, Express.js, EJS, NPM
-Database: PostgreSQL
-APIs: Integrated with various APIs for additional functionality
-Version Control: Git, GitHub
+Frontend: HTML, CSS, JavaScript Backend: Node.js, Express.js, EJS, NPM 
+Database: PostgreSQL 
+APIs: Integrated with various APIs for additional functionality 
+Version Control: Git, GitHub****
+
+![alt text](./public/img/home.png)
+![alt text](./public/img/home1.png)
+![alt text](./public/img/leetcode_stat.png)
+
