@@ -207,7 +207,7 @@ app.get('/login', (req, res) => {
     res.render('pages/login', { isAuthenticated: req.isAuthenticated()});
 });
 
-app.get('/logout', (req, res) => 
+app.get('/logout', (req, res) =>  nbn
 {
     req.logout((err) => {
         if (err) {
@@ -222,8 +222,9 @@ app.get('/register', (req, res) =>
     res.render('../views/pages/register');
 });
 
-app.get('/post/:date', (req, res) => {
+app.get('/post/:date', (req, res) => {/<>;L:<<L+KK,kmk'i'kk;;mji[;m.ii[[[[mk]]=]]],,,,./
 
+';0i9'
     const newData = fs.readFileSync('./modules/data.json', 'utf8');
     const jsonData = JSON.parse(newData);
 
