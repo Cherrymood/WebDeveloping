@@ -11,8 +11,9 @@ import pkg from 'passport-local';
 import env from "dotenv";
 import GoogleStrategy from "passport-google-oauth2";
 
+
 const app = express();
-const port = 11011;
+const port = 3000;
 env.config();
 
 
@@ -354,13 +355,12 @@ app.get("/auth/google/editor",
     })
 )
 
-app.post('/login', 
-
+app.post('/login',
     passport.authenticate('local', {
-    successRedirect: '/editor',
-    failureRedirect: '/login',
-    failureFlash: true // If using connect-flash for flash messages
-  }));
+      successRedirect: '/editor',
+      failureRedirect: '/login',
+    })
+  );
 
 app.post('/register', (req, res) => {
 
@@ -492,30 +492,37 @@ passport.use("google", new GoogleStrategy({
     }
 }));
 
-passport.use("local",
-    new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password'
-  }, async (email, password, done) => {
-    try {
-      // Fetch user with the given email
-      const result = await db.query("SELECT * FROM registration WHERE email = $1", [email]);
-      if (result.rows.length === 0) {
-        return done(null, false, { message: 'Incorrect email.' });
-      }
+passport.use(
+    "local",
+    new LocalStrategy(
+
+      async (email, password, done) => {
+        try {
+          // Fetch user with the given email from the database
+          const result = await db.query("SELECT * FROM registration WHERE email = $1", [email]);
+          if (result.rows.length === 0) {
+            // Email doesn't exist
+            return done(null, false, { message: "Incorrect email." });
+          }
   
-      const user = result.rows[0];
-      const match = await bcrypt.compare(password, user.password);
+          const user = result.rows[0];
+          // Compare the password using bcrypt
+          const match = await bcrypt.compare(password, user.password);
   
-      if (match) {
-        return done(null, user);
-      } else {
-        return done(null, false, { message: 'Incorrect password.' });
+          if (match) {
+            // If the passwords match, return the user
+            return done(null, user);
+          } else {
+            // Incorrect password
+            return done(null, false, { message: "Incorrect password." });
+          }
+        } catch (err) {
+          // Handle any errors
+          return done(err);
+        }
       }
-    } catch (err) {
-      return done(err);
-    }
-}));
+    )
+  );  
   
 passport.serializeUser((user, cb) => {
     cb(null, user);
