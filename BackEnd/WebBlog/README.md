@@ -46,14 +46,17 @@ This is a Node.js-based web application built using **Express.js** for the backe
 
 1. Clone the repository:
 
+   ```bash
    git clone https://github.com/Cherrymood/WebDeveloping.git
-   cd WebBlog
+   cd WebDeveloping/backend/web-blog
 2. Install the dependencies:
+    ```bash
     npm install
-3. Set up the PostgreSQL database:
+4. Set up the PostgreSQL database:
     Create a PostgreSQL database and run the SQL scripts in the sql/ directory (if applicable) to set up your tables (e.g., registration).
     Update the database configuration in server.js or create a .env file with the necessary environment variables.
-4. Run the application:
+5. Run the application:
+    ```bash
     node server.js
 
 ## Usage
@@ -63,7 +66,7 @@ This is a Node.js-based web application built using **Express.js** for the backe
     Only logged-in users can access the editor to create or edit posts.
 
 ## Routes
-
+ ```bash
 /post: User create the post
 /home: Home page
 /joke: Joke API
@@ -74,7 +77,6 @@ This is a Node.js-based web application built using **Express.js** for the backe
 /register: User registration page
 /editor: Editor for creating or updating content (requires authentication)
 /logout: Log out the current user
-
 
 ![alt text](./public/img/home.png)
 ![alt text](./public/img/home_1.png)
