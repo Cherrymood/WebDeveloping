@@ -21,7 +21,7 @@ This is a Node.js-based web application built using **Express.js** for the backe
 - [Usage](#usage)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
-- [License](#license)
+- [Photoes](#photoes)
 
 ## Features
 
@@ -41,6 +41,11 @@ This is a Node.js-based web application built using **Express.js** for the backe
 - **EJS (Embedded JavaScript)**: Templating engine for rendering views
 - **Passport.js**: Authentication middleware for Node.js
 - **bcrypt**: Library for hashing and comparing passwords
+- **connect-flash**: For displaying flash messages (e.g., login errors)
+- **Joke API**: External API for fetching jokes
+- **New York Times API**: External API for fetching news articles
+- **LeetCode API**: External API for retrieving user stats from LeetCode
+- **Weather API**: External API for fetching weather data
 
 ## Installation
 
@@ -59,24 +64,29 @@ This is a Node.js-based web application built using **Express.js** for the backe
     ```bash
     node server.js
 
-## Usage
+## Usage:
 
     Register a new user or log in using your credentials.
     View and interact with the blog content.
     Only logged-in users can access the editor to create or edit posts.
 
 ## Routes
- ```bash
-/post: User create the post
+
+/post: Create a new blog post (requires authentication)
 /home: Home page
-/joke: Joke API
-/nytimes: NewYork Times API
-/stat: Leetcode API
-/weather: Weather API
+/joke: Fetch random jokes from the Joke API
+/nytimes: Fetch news articles from the New York Times API
+/stat: Fetch LeetCode stats for the logged-in user
+/weather: Fetch current weather information from the Weather API
 /login: User login page
 /register: User registration page
 /editor: Editor for creating or updating content (requires authentication)
 /logout: Log out the current user
+
+##Project Structure
+
+
+## Photoes:
 
 ![alt text](./public/img/home.png)
 ![alt text](./public/img/home_1.png)
