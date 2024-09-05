@@ -1,0 +1,52 @@
+body {
+  text-align: center;
+  background-color: #C2D9FF;
+}
+
+#level-title {
+  font-size: 6rem;
+  margin:  5%;
+  color: #BB8FA9;
+}
+
+.container {
+  display: block;
+  width: 50%;
+  margin: auto;
+
+}
+
+.btn {
+  margin: 25px;
+  display: inline-block;
+  height: 200px;
+  width: 200px;
+  border: 10px solid black;
+  border-radius: 20%;
+}
+
+.game-over {
+  background-color: #F85959;
+  opacity: 0.8;
+}
+
+.red {
+  background-color: #F12D2D;
+}
+
+.green {
+  background-color: #36AE7C;
+}
+
+.blue {
+  background-color: #3F52E3;
+}
+
+.yellow {
+  background-color: #FAF15D;
+}
+
+.pressed {
+  box-shadow: 0 0 20px white;
+  background-color: grey;
+}
