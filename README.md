@@ -92,6 +92,5 @@ This is a Node.js-based web application built using **Express.js** for the backe
 
 ## Photoes:
 
-![alt text](./public/img/home.png)
-![alt text](./public/img/home_1.png)
-![alt text](./public/img/leetcode_stat.png)
+![alt text](./BackEnd/WebBlog/public/img/home.png)
+![alt text](./BackEnd/WebBlog/public/img/home_1.png)
