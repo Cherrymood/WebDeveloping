@@ -18,6 +18,6 @@ APIs: Integrated with various APIs for additional functionality
 Version Control: Git, GitHub****
 
 ![alt text](./public/img/home.png)
-![alt text](./public/img/home_1.png)
+![alt text](./public/img/home1.png)
 ![alt text](./public/img/leetcode_stat.png)
 

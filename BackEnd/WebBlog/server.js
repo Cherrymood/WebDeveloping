@@ -12,7 +12,7 @@ import env from "dotenv";
 import GoogleStrategy from "passport-google-oauth2";
 
 const app = express();
-const port = 3000;
+const port = 11011;
 env.config();
 
 
