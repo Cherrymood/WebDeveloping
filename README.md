@@ -1,7 +1,3 @@
-# WebDeveloping
-Here I practice HTML5, CSS3, JavaScript, Node.js, Express.js, React.js, SQL, and PostgreSQL.
-It also covers advanced topics like Web3, blockchain technology, and NFTs.
-
 Web Blog Project
 
 Welcome to my web blog project! This project is a personal blog where I practice my skills.
@@ -92,5 +88,7 @@ This is a Node.js-based web application built using **Express.js** for the backe
 
 ## Photoes:
 
-![alt text](./BackEnd/WebBlog/public/img/home.png)
-![alt text](./BackEnd/WebBlog/public/img/home_1.png)
+![alt text](./public/img/home.png)
+![alt text](./public/img/home_1.png)
+![alt text](./public/img/leetcode_stat.png)
+
